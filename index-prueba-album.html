@@ -650,7 +650,7 @@ document.getElementById('albumUploadButton').addEventListener('click',async()=>{
   if(files.length>20){albumStatus('Para evitar una subida demasiado grande, selecciona como máximo 20 capturas cada vez.');return;}
   if(!confirm('Vas a subir '+files.length+' captura(s) al espacio privado de tu cuenta Firebase. Usarán parte del almacenamiento gratuito disponible. ¿Continuar?'))return;
   const btn=document.getElementById('albumUploadButton');btn.disabled=true;albumBusy=true;
-  let saved=0;
+  let saved=0, skipped=0, skippedNames=[];
   try{
     for(let i=0;i<files.length;i++){
       albumStatus('Preparando captura '+(i+1)+' de '+files.length+'…');
@@ -668,14 +668,20 @@ document.getElementById('albumUploadButton').addEventListener('click',async()=>{
         };reader.readAsDataURL(file);
       });
       const bytes=albumByteLength(dataUrl);
-      if(bytes>650*1024){albumStatus('La captura «'+file.name+'» ocupa '+Math.round(bytes/1024)+' KB tras optimizarse. Para proteger el espacio gratuito, no se ha subido. Prueba a reducirla o guardarla en una resolución menor.');continue;}
+      if(bytes>650*1024){skipped++;skippedNames.push(file.name);albumStatus('La captura «'+file.name+'» ocupa '+Math.round(bytes/1024)+' KB después de optimizarla y se ha omitido para proteger el espacio gratuito.');continue;}
       const photoRef=albumMetaRef.push(), id=photoRef.key;
       const metadata={albumId:albumId,date:albumDateEl.value||todayLocal(),name:file.name.slice(0,180),bytes:bytes,mime:dataUrl.slice(5,dataUrl.indexOf(';')),createdAt:Date.now()};
       try{await albumImageRef.child(id).set({dataUrl:dataUrl});await photoRef.set(metadata);saved++;}
       catch(err){try{await albumImageRef.child(id).remove();}catch(_){}throw err;}
     }
     input.value='';
-    albumStatus(saved+' captura(s) guardada(s). Se sincronizarán en los dispositivos donde entres con esta misma cuenta. Recuerda que el espacio gratuito es limitado.');
+    if(saved>0){
+      albumStatus(saved+' captura(s) guardada(s).'+(skipped?' '+skipped+' captura(s) omitida(s) por superar el límite recomendado: '+skippedNames.join(', ')+'.':'')+' Se sincronizarán en los dispositivos donde entres con esta misma cuenta. Recuerda que el espacio gratuito es limitado.');
+    }else if(skipped>0){
+      albumStatus('No se ha guardado ninguna captura porque '+skipped+' imagen(es) superaron los 650 KB tras optimizarlas: '+skippedNames.join(', ')+'. Prueba con una captura más pequeña.');
+    }else{
+      albumStatus('No se ha guardado ninguna captura. No hubo imágenes aptas para subir; selecciona una captura e inténtalo de nuevo.');
+    }
     albumSelectedDateOnly=false;albumRenderPhotos();
   }catch(err){albumStatus('La subida se ha detenido. '+friendlyError(err)+' Se guardaron '+saved+' captura(s) antes del error.');}
   finally{btn.disabled=false;albumBusy=false;}
