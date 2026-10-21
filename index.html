@@ -268,6 +268,7 @@ document.getElementById('clearButton').addEventListener('click', () => {
 function renderEntries(){
   const root = document.getElementById('entriesList');
   const reader = document.getElementById('bookReader');
+  root.classList.remove('hidden');
   const pages = pagesCache[currentSection] || {};
   const list = Object.entries(pages).map(([id,item])=>({id,item,legacy:false}));
   if(currentSection === 'memories'){
