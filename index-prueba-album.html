@@ -443,7 +443,7 @@ writeSectionButton.addEventListener('click', () => {
   document.getElementById('entryTitle').focus({preventScroll:true});
 });
 
-document.querySelectorAll('.tab-button').forEach(button => button.addEventListener('click', () => {
+document.querySelectorAll('.book-tabs .tab-button:not(.countdown-tab)').forEach(button => button.addEventListener('click', () => {
   currentSection = button.dataset.section;
   document.getElementById('journalSearch').value='';
   editingPageId = null;
