@@ -130,7 +130,7 @@ const loginStatus = document.getElementById('loginStatus');
 const saveStatus = document.getElementById('saveStatus');
 const loginButton = document.getElementById('loginButton');
 const saveButton = document.getElementById('saveButton');
-let auth = null, db = null, currentUser = null, entriesRef = null, pagesRef = null, entriesCache = {}, pagesCache = {}, currentSection = 'poems', editingPageId = null, selectedPhotoData = [], existingPhotoData = [], currentCalendarDate = todayLocal(), calendarViewDate = new Date();entRenderedPages = [], selectedPageKeys = {};
+let auth = null, db = null, currentUser = null, entriesRef = null, pagesRef = null, entriesCache = {}, pagesCache = {}, currentSection = 'poems', editingPageId = null, selectedPhotoData = [], existingPhotoData = [], currentRenderedPages = [], selectedPageKeys = {}, currentCalendarDate = todayLocal(), calendarViewDate = new Date();
 
 const sectionNames = { poems: 'Mis poemas', thoughts: 'Mis pensamientos', memories: 'Mis recuerdos' };
 function showStatus(el, message){ el.textContent = message; }
