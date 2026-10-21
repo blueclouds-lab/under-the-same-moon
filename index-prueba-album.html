@@ -127,6 +127,24 @@ label{display:block;font-size:17px;font-style:italic;color:#c8c5d0;margin:13px 0
 .thinking-custom-message label{display:block;margin-bottom:9px;color:#f0dca8;font-family:'Cormorant Garamond',serif;font-size:20px}
 .thinking-custom-message textarea{display:block;width:100%;box-sizing:border-box;min-height:90px;resize:vertical;background:#1d1f2c;color:var(--ink);border:1px solid #625a70;border-radius:10px;padding:12px;font:inherit;line-height:1.6;margin-bottom:10px}
 .thinking-custom-message .hint{margin-bottom:0}
+.star-universe{max-width:620px;margin:30px auto 10px;padding:22px 16px;border:1px solid #625a70;border-radius:18px;background:radial-gradient(ellipse at 50% 0,#292b43,#171b2c 76%);text-align:center;overflow:hidden}
+.star-universe-heading>span{color:#f1d58e;font-size:25px;letter-spacing:.2em}
+.star-universe-heading h3{margin:8px 0;color:#f0dca8;font-family:'Cormorant Garamond',serif;font-size:clamp(24px,5vw,31px);font-weight:500}
+.star-universe-heading p{margin:0 auto 12px;max-width:420px;color:#d4d4e1;font-size:14px;line-height:1.6}
+.star-constellation-sky{position:relative;max-width:420px;margin:0 auto;min-height:190px}
+.star-constellation-sky svg{display:block;width:100%;height:auto;overflow:visible}
+.star-constellation-sky .constellation-line{stroke:#d9d5f5;stroke-width:1.1;stroke-opacity:.48;fill:none}
+.star-constellation-sky .constellation-star{fill:#fff0b8;stroke:#fff8db;stroke-width:1;filter:drop-shadow(0 0 4px #f0cb68)}
+.star-constellation-sky .constellation-star-new{animation:constellationTwinkle 1.6s ease-in-out infinite alternate}
+.star-constellation-empty{position:absolute;inset:38% 8% auto;color:#d5d2e2;font-size:13px;font-style:italic;pointer-events:none}
+.star-universe-count{color:#f1d58e;font-size:13px;margin:7px 0 15px}
+.star-universe-list{display:grid;gap:10px;text-align:left}
+.star-saved-card{padding:13px;border:1px solid #55516a;border-radius:12px;background:#202335}
+.star-saved-card p{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.6;margin:7px 0 10px;color:#f1edf7}
+.star-saved-card time{font-size:12px;color:#bdbbd0}
+.star-saved-actions{display:flex;gap:8px;flex-wrap:wrap}
+.star-saved-actions button{font-size:13px;padding:7px 10px}
+@keyframes constellationTwinkle{from{opacity:.55;filter:drop-shadow(0 0 2px #f0cb68)}to{opacity:1;filter:drop-shadow(0 0 8px #f0cb68)}}
 
 .special-letters-panel{text-align:center}
 .letters-form{max-width:620px;margin:18px auto;text-align:left;display:grid;gap:12px}
@@ -272,6 +290,20 @@ label{display:block;font-size:17px;font-style:italic;color:#c8c5d0;margin:13px 0
       <p class="hint">Tu mensaje aparecerá bajo la Luna y podrás compartirlo o copiarlo igual que los demás.</p>
     </div>
     <p class="status" id="thinkingMessageStatus" role="status" aria-live="polite"></p>
+    <section class="star-universe" aria-labelledby="starUniverseHeading">
+      <div class="star-universe-heading">
+        <span aria-hidden="true">✧ ☾ ✧</span>
+        <h3 id="starUniverseHeading">Nuestro universo de estrellas</h3>
+        <p>Cada mensaje que guardes se convierte en una estrella de vuestra constelación.</p>
+      </div>
+      <div id="starConstellationSky" class="star-constellation-sky" role="img" aria-label="Constelación de vuestros mensajes guardados">
+        <svg id="starConstellationSvg" viewBox="0 0 320 220" aria-hidden="true"></svg>
+        <div id="starConstellationEmpty" class="star-constellation-empty">Vuestro cielo espera su primera estrella. 💫</div>
+      </div>
+      <p id="starUniverseCount" class="star-universe-count">Todavía no hay estrellas guardadas.</p>
+      <div id="starUniverseList" class="star-universe-list"></div>
+      <p class="hint">Las estrellas se guardan en este navegador. Para verlas también en otro dispositivo, más adelante podemos preparar una sincronización privada.</p>
+    </section>
     <div class="countdown-actions"><button type="button" class="secondary" id="thinkingOfYouReturn">Volver al libro</button></div>
   </section>
 
@@ -1233,6 +1265,12 @@ function friendlyError(err){
  const message=document.getElementById('thinkingMessageText');
  const messageCard=document.getElementById('thinkingMessageCard');
  const status=document.getElementById('thinkingMessageStatus');
+ const customText=document.getElementById('thinkingCustomText');
+ const constellationSvg=document.getElementById('starConstellationSvg');
+ const constellationEmpty=document.getElementById('starConstellationEmpty');
+ const universeCount=document.getElementById('starUniverseCount');
+ const universeList=document.getElementById('starUniverseList');
+ const starStorageKey='underSameMoon.personalStars.v1';
  if(!panel||!tab||!view||!back||!mood||!message)return;
  const normalTabs=Array.from(panel.querySelectorAll('.book-tabs .tab-button:not(.countdown-tab):not(.letters-tab):not(.thinking-tab)'));
  const messages={
@@ -1299,6 +1337,7 @@ function friendlyError(err){
  };
  let currentMessage=messages[mood.value][0];
  function say(t){if(status)status.textContent=t;}
+ renderConstellation();
  function showPerseid(){
    if(!messageCard)return;
    messageCard.classList.remove('meteor-active','meteor-glow');
@@ -1342,14 +1381,59 @@ function friendlyError(err){
  back.addEventListener('click',showBook);
  mood.addEventListener('change',()=>{currentMessage='';chooseMessage();});
  document.getElementById('thinkingNewMessage').addEventListener('click',chooseMessage);
- const customText=document.getElementById('thinkingCustomText');
+ const starPoints=[[38,42],[84,26],[126,52],[172,30],[224,48],[278,32],[294,91],[247,119],[198,91],[155,128],[108,103],[55,135],[78,177],[143,183],[209,166],[267,185]];
+ const starLinks=[[0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,7],[7,8],[8,9],[9,10],[10,11],[11,12],[12,13],[13,14],[14,15],[2,10],[4,8],[8,14]];
+ let savedStars=[];
+ try{const stored=JSON.parse(localStorage.getItem(starStorageKey)||'[]');if(Array.isArray(stored))savedStars=stored.filter(s=>s&&typeof s.text==='string').slice(-100);}catch(_){}
+ function saveStars(){try{localStorage.setItem(starStorageKey,JSON.stringify(savedStars));return true;}catch(_){say('No se ha podido guardar en este navegador. Puedes copiar el mensaje para conservarlo.');return false;}}
+ function renderConstellation(){
+   if(!constellationSvg||!universeList)return;
+   constellationSvg.replaceChildren();
+   const ns='http://www.w3.org/2000/svg';
+   const visibleCount=Math.min(savedStars.length,starPoints.length);
+   starLinks.forEach(([a,b])=>{
+     if(a>=visibleCount||b>=visibleCount)return;
+     const line=document.createElementNS(ns,'line');
+     line.setAttribute('x1',starPoints[a][0]);line.setAttribute('y1',starPoints[a][1]);
+     line.setAttribute('x2',starPoints[b][0]);line.setAttribute('y2',starPoints[b][1]);
+     line.setAttribute('class','constellation-line');constellationSvg.appendChild(line);
+   });
+   savedStars.slice(0,starPoints.length).forEach((star,index)=>{
+     const [x,y]=starPoints[index];
+     const circle=document.createElementNS(ns,'circle');
+     circle.setAttribute('cx',x);circle.setAttribute('cy',y);circle.setAttribute('r',index===savedStars.length-1?4.2:3);
+     circle.setAttribute('class','constellation-star'+(index===savedStars.length-1?' constellation-star-new':''));
+     constellationSvg.appendChild(circle);
+   });
+   if(constellationEmpty)constellationEmpty.style.display=savedStars.length?'none':'block';
+   if(universeCount)universeCount.textContent=savedStars.length===0?'Todavía no hay estrellas guardadas.':savedStars.length===1?'Una estrella guardada en vuestro cielo. 💫':savedStars.length+' estrellas guardadas en vuestro cielo. 💫';
+   universeList.replaceChildren();
+   savedStars.forEach((star,index)=>{
+     const card=document.createElement('article');card.className='star-saved-card';
+     const date=document.createElement('time');date.textContent=star.date||'Un recuerdo bajo la Luna';
+     const textEl=document.createElement('p');textEl.textContent=star.text;
+     const actions=document.createElement('div');actions.className='star-saved-actions';
+     const relight=document.createElement('button');relight.type='button';relight.textContent='Volver a iluminar ✨';
+     relight.addEventListener('click',()=>{currentMessage=star.text;message.textContent=currentMessage;if(customText)customText.value=star.text;showPerseid();say('Esta estrella ha vuelto a brillar bajo la Luna. 💙');view.scrollIntoView({behavior:'smooth',block:'center'});});
+     const share=document.createElement('button');share.type='button';share.className='secondary';share.textContent='Compartir';
+     share.addEventListener('click',async()=>{const payload={title:'Una estrella para ti ☾',text:star.text+'\n\n— Under the same Moon ☾'};try{if(typeof navigator.share==='function'){await navigator.share(payload);}else{await copyText(payload.text);say('Mensaje copiado para compartir. 💙');}}catch(err){if(err&&err.name!=='AbortError')say('Puedes usar «Volver a iluminar» y después «Copiar mensaje».');}});
+     actions.append(relight,share);card.append(date,textEl,actions);universeList.appendChild(card);
+   });
+ }
  document.getElementById('thinkingUseCustomMessage').addEventListener('click',()=>{
    const value=(customText?.value||'').trim();
    if(!value){say('Escribe primero unas palabras para regalarle tu estrella. 💙');customText?.focus();return;}
    currentMessage=value;
    message.textContent=currentMessage;
+   const duplicate=savedStars.some(s=>s.text===value);
+   if(!duplicate){
+     savedStars.unshift({text:value,date:new Intl.DateTimeFormat('es-ES',{dateStyle:'long'}).format(new Date()),createdAt:Date.now()});
+     savedStars=savedStars.slice(0,100);
+     saveStars();
+   }
+   renderConstellation();
    showPerseid();
-   say('Tu mensaje ya brilla bajo la Luna. Puedes compartirlo o copiarlo cuando quieras. 💙');
+   say(duplicate?'Este mensaje ya tenía su estrella guardada. La hemos vuelto a iluminar. 💙':'Tu estrella ya forma parte de vuestro universo. Puedes compartirla cuando quieras. 💙');
  });
  document.getElementById('thinkingCopyMessage').addEventListener('click',async()=>{const value=currentMessage+'\n\n— Under the same Moon ☾';say(await copyText(value)?'Mensaje copiado. Ya puedes pegarlo donde quieras. 💙':'No se pudo copiar automáticamente; puedes seleccionar el texto y copiarlo.');});
  document.getElementById('thinkingShareMessage').addEventListener('click',async()=>{
