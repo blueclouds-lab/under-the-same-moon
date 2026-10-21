@@ -353,9 +353,16 @@ document.getElementById('calendarPrev').addEventListener('click',()=>{calendarVi
 document.getElementById('calendarNext').addEventListener('click',()=>{calendarViewDate.setMonth(calendarViewDate.getMonth()+1);renderCalendar();});
 
 const writeSectionButton = document.getElementById('writeSectionButton');
+function setSectionFocus(focused) {
+  journalPanel.classList.toggle('section-only-view', focused);
+  document.getElementById('screenshotAlbumPanel').style.display = focused ? 'none' : '';
+  document.querySelector('.lunar-calendar').style.display = focused ? 'none' : '';
+  document.getElementById('pageEditor').style.display = focused ? 'none' : '';
+  document.getElementById('sharePanel').style.display = focused ? 'none' : '';
+  writeSectionButton.classList.toggle('hidden', !focused);
+}
 writeSectionButton.addEventListener('click', () => {
-  journalPanel.classList.remove('section-only-view');
-  writeSectionButton.classList.add('hidden');
+  setSectionFocus(false);
   document.getElementById('pageEditor').scrollIntoView({behavior:'smooth',block:'start'});
   document.getElementById('entryTitle').focus({preventScroll:true});
 });
@@ -371,8 +378,7 @@ document.querySelectorAll('.tab-button').forEach(button => button.addEventListen
   clearPhoto();
   document.getElementById('entryText').placeholder = currentSection === 'poems' ? 'Deja que las palabras encuentren su lugar…' : currentSection === 'thoughts' ? 'Escribe aquí lo que llevas dentro…' : 'Guarda aquí los momentos que quieras conservar…';
   showStatus(saveStatus, '');
-  journalPanel.classList.add('section-only-view');
-  writeSectionButton.classList.remove('hidden');
+  setSectionFocus(true);
   renderEntries();
   document.getElementById('sectionHeading').scrollIntoView({behavior:'smooth',block:'start'});
 }));
@@ -522,7 +528,7 @@ function readSavedPage(index){
     updatePhotoPreview(existingPhotoData);
     editingPageId = legacy ? null : id;
     showStatus(saveStatus, legacy ? 'Este recuerdo antiguo se conserva intacto. Si lo guardas, se creará una nueva página en Recuerdos.' : 'Página abierta para editar.');
-    journalPanel.classList.remove('section-only-view'); writeSectionButton.classList.add('hidden');
+    setSectionFocus(false);
     reader.classList.add('hidden'); root.classList.remove('hidden');
     window.scrollTo({top:0,behavior:'smooth'});
   });
