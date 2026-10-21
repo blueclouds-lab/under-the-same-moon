@@ -658,11 +658,19 @@ document.getElementById('albumUploadButton').addEventListener('click',async()=>{
       const dataUrl=await new Promise((resolve,reject)=>{
         const reader=new FileReader();reader.onerror=()=>reject(new Error('No se pudo leer '+file.name));reader.onload=()=>{
           const original=new Image();original.onerror=()=>reject(new Error('No se pudo abrir '+file.name));original.onload=()=>{
-            const max=1800,scale=Math.min(1,max/Math.max(original.width,original.height));
-            const canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(original.width*scale));canvas.height=Math.max(1,Math.round(original.height*scale));
-            const ctx=canvas.getContext('2d');ctx.fillStyle='#ffffff';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.drawImage(original,0,0,canvas.width,canvas.height);
-            let result=canvas.toDataURL('image/webp',0.82);
-            if(!result.startsWith('data:image/webp'))result=canvas.toDataURL('image/jpeg',0.78);
+            let result='',max=1800;
+            const canvas=document.createElement('canvas');
+            for(let pass=0;pass<7;pass++){
+              const scale=Math.min(1,max/Math.max(original.width,original.height));
+              canvas.width=Math.max(1,Math.round(original.width*scale));canvas.height=Math.max(1,Math.round(original.height*scale));
+              const ctx=canvas.getContext('2d');ctx.fillStyle='#ffffff';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.drawImage(original,0,0,canvas.width,canvas.height);
+              for(const quality of [0.78,0.68,0.58,0.48]){
+                result=canvas.toDataURL('image/webp',quality);
+                if(!result.startsWith('data:image/webp'))result=canvas.toDataURL('image/jpeg',quality);
+                if(albumByteLength(result)<=600*1024){resolve(result);return;}
+              }
+              max=Math.round(max*0.85);
+            }
             resolve(result);
           };original.src=reader.result;
         };reader.readAsDataURL(file);
