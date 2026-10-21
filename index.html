@@ -24,7 +24,7 @@ label{display:block;font-size:17px;font-style:italic;color:#c8c5d0;margin:13px 0
 .book-tabs .tab-button.active{background:linear-gradient(145deg,#f4d985,#d9b45b);color:#282331;border-color:#f0cb68;border-bottom-color:#a98036;box-shadow:inset 0 1px 0 #fff7d4,0 5px 13px #0003;transform:translateY(-2px)}
 .book-tabs .tab-button.active:before{color:#69542b;text-shadow:0 0 8px #fff4c0}
 .book-heading{font-family:"Parisienne",cursive;font-size:38px;color:#f0cb68;margin:12px 0 18px;padding-bottom:10px;border-bottom:1px solid #48495a;text-shadow:0 0 18px #f0cb681a}
-@media(max-width:430px){.book-tabs{gap:6px}.book-tabs .tab-button{flex-basis:calc(33.333% - 5px);padding:11px 5px;font-size:16px}.book-tabs .tab-button:before{font-size:16px}.book-heading{font-size:34px}}.hidden{display:none!important}.entry-item{border-top:1px solid #48495a;padding:14px 0;white-space:pre-wrap;background:linear-gradient(to bottom,transparent 0,transparent 31px,#383a4b 32px);line-height:1.7}.entry-date{font-size:15px;font-style:italic;color:#aaaabd;margin-bottom:5px}.lunar-card{display:flex;align-items:center;gap:15px;margin:12px 0 20px;padding:14px 16px;border:1px solid #48495a;border-radius:12px;background:linear-gradient(135deg,#2c2e3d,#222431)}.lunar-symbol{font-size:38px;line-height:1;color:#f0cb68;min-width:42px;text-align:center;text-shadow:0 0 12px #f0cb6855}.lunar-name{font-size:21px;color:#f0cb68;font-style:italic}.lunar-detail{font-size:15px;color:#c8c5d0;margin-top:3px}.photo-preview-wrap{margin:12px 0 18px}.photo-preview-wrap img,.entry-photo{display:block;max-width:100%;max-height:420px;object-fit:contain;border:1px solid #48495a;border-radius:10px;margin:10px 0;background:#171923}.photo-preview-wrap img{max-height:260px}.footer{text-align:center;font-size:13px;color:#aaaabd;padding:20px}
+@media(max-width:430px){.book-tabs{gap:6px}.book-tabs .tab-button{flex-basis:calc(33.333% - 5px);padding:11px 5px;font-size:16px}.book-tabs .tab-button:before{font-size:16px}.book-heading{font-size:34px}}.hidden{display:none!important}.entry-item{position:relative;white-space:pre-wrap;line-height:1.7}.entry-date{font-size:15px;font-style:italic;color:#aaaabd;margin-bottom:5px}.saved-book{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;margin-top:18px}.book-page-preview{position:relative;min-height:205px;padding:22px 20px 18px 28px;border:1px solid #57566a;border-radius:4px 13px 13px 4px;background:linear-gradient(90deg,#343444 0,#292a39 12px,#292a39 13px,#252634 100%);box-shadow:inset 3px 0 5px #0c0d1555,0 8px 18px #0003;overflow:hidden}.book-page-preview:before{content:"";position:absolute;left:19px;top:0;bottom:0;width:1px;background:#555469}.book-page-preview:after{content:"✧";position:absolute;right:14px;top:10px;color:#f0cb68;font-size:15px;opacity:.75}.book-page-preview h3{font-family:"Parisienne",cursive;font-size:29px;font-weight:400;color:#f0cb68;margin:7px 0 8px;overflow-wrap:anywhere}.book-page-preview .page-excerpt{color:#dedbe5;line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere}.book-page-preview .entry-photo{max-height:145px;width:auto}.reader-page{position:relative;margin:22px 0;padding:clamp(24px,6vw,46px) clamp(22px,6vw,50px);min-height:300px;border:1px solid #666176;border-radius:5px 18px 18px 5px;background:linear-gradient(90deg,#373647 0,#2b2c3b 15px,#2b2c3b 16px,#272836 100%);box-shadow:inset 4px 0 7px #08091066,0 16px 28px #0004}.reader-page:before{content:"";position:absolute;left:22px;top:0;bottom:0;width:1px;background:#5b586d}.reader-page h3{font-family:"Parisienne",cursive;font-weight:400;font-size:clamp(34px,7vw,48px);color:#f0cb68;line-height:1.2;margin:10px 0 20px}.reader-page .reader-text{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.9;font-size:21px;color:#e2deea;min-height:90px}.reader-page .entry-photo{max-height:440px;margin:22px auto}.reader-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:space-between}.reader-actions button{margin:8px 4px 0 0}.lunar-card{display:flex;align-items:center;gap:15px;margin:12px 0 20px;padding:14px 16px;border:1px solid #48495a;border-radius:12px;background:linear-gradient(135deg,#2c2e3d,#222431)}.lunar-symbol{font-size:38px;line-height:1;color:#f0cb68;min-width:42px;text-align:center;text-shadow:0 0 12px #f0cb6855}.lunar-name{font-size:21px;color:#f0cb68;font-style:italic}.lunar-detail{font-size:15px;color:#c8c5d0;margin-top:3px}.photo-preview-wrap{margin:12px 0 18px}.photo-preview-wrap img,.entry-photo{display:block;max-width:100%;max-height:420px;object-fit:contain;border:1px solid #48495a;border-radius:10px;margin:10px 0;background:#171923}.photo-preview-wrap img{max-height:260px}.footer{text-align:center;font-size:13px;color:#aaaabd;padding:20px}
 </style>
 </head>
 <body>
@@ -81,6 +81,7 @@ label{display:block;font-size:17px;font-style:italic;color:#c8c5d0;margin:13px 0
   <p class="status" id="saveStatus" role="status"></p>
   <div style="margin-top:26px">
     <h2 id="entriesHeading">Poemas escritos</h2>
+    <div id="bookReader" class="hidden" aria-live="polite"></div>
     <div id="entriesList"><p class="hint">Tus páginas aparecerán aquí cuando guardes la primera.</p></div>
   </div>
 </section>
@@ -105,7 +106,7 @@ const loginStatus = document.getElementById('loginStatus');
 const saveStatus = document.getElementById('saveStatus');
 const loginButton = document.getElementById('loginButton');
 const saveButton = document.getElementById('saveButton');
-let auth = null, db = null, currentUser = null, entriesRef = null, pagesRef = null, entriesCache = {}, pagesCache = {}, currentSection = 'poems', editingPageId = null, selectedPhotoData = null, existingPhotoData = null;
+let auth = null, db = null, currentUser = null, entriesRef = null, pagesRef = null, entriesCache = {}, pagesCache = {}, currentSection = 'poems', editingPageId = null, selectedPhotoData = null, existingPhotoData = null, currentRenderedPages = [];
 
 const sectionNames = { poems: 'Mis poemas', thoughts: 'Mis pensamientos', memories: 'Mis recuerdos' };
 function showStatus(el, message){ el.textContent = message; }
@@ -266,36 +267,81 @@ document.getElementById('clearButton').addEventListener('click', () => {
 });
 function renderEntries(){
   const root = document.getElementById('entriesList');
+  const reader = document.getElementById('bookReader');
   const pages = pagesCache[currentSection] || {};
   const list = Object.entries(pages).map(([id,item])=>({id,item,legacy:false}));
   if(currentSection === 'memories'){
     Object.entries(entriesCache).forEach(([date,item])=>list.push({id:date,item:{...item,date},legacy:true}));
   }
   list.sort((a,b)=>(b.item.date || b.id).localeCompare(a.item.date || a.id));
-  if(!list.length){ root.innerHTML='<p class="hint">Esta parte de tu libro está esperando tus palabras. 💛</p>'; return; }
+  currentRenderedPages = list;
+  reader.classList.add('hidden');
+  reader.replaceChildren();
+  if(!list.length){
+    root.innerHTML='<p class="hint">Esta parte de tu libro está esperando tus palabras. 💛</p>';
+    return;
+  }
+  root.className='saved-book';
   root.replaceChildren();
-  list.forEach(({id,item,legacy}) => {
-    const wrap = document.createElement('div'); wrap.className='entry-item';
+  list.forEach(({id,item}, index) => {
+    const page = document.createElement('article'); page.className='book-page-preview';
     const day = document.createElement('div'); day.className='entry-date'; day.textContent = item.date || id;
-    const title = document.createElement('strong'); title.textContent = item.title || (currentSection==='poems'?'Un poema sin título':currentSection==='thoughts'?'Un pensamiento':'Un recuerdo');
-    const preview = document.createElement('p'); preview.style.margin='6px 0'; preview.textContent = (item.text || '').slice(0,220) + ((item.text || '').length>220?'…':'');
-    let photo = null;
-    if(item.photoData){ photo = document.createElement('img'); photo.className='entry-photo'; photo.src=item.photoData; photo.alt='Fotografía guardada en esta página'; }
-    const open = document.createElement('button'); open.className='secondary'; open.type='button'; open.textContent='Abrir y editar';
-    open.addEventListener('click',()=>{
-      document.getElementById('entryDate').value = item.date || id;
-      updateLunarPhase(document.getElementById('entryDate').value);
-      document.getElementById('entryTitle').value = item.title || '';
-      document.getElementById('entryText').value = item.text || '';
-      selectedPhotoData = null; existingPhotoData = item.photoData || null;
-      document.getElementById('entryPhoto').value = '';
-      updatePhotoPreview(existingPhotoData);
-      editingPageId = legacy ? null : id;
-      showStatus(saveStatus, legacy ? 'Este recuerdo antiguo se conserva intacto. Si lo guardas, se creará una nueva página en Recuerdos.' : 'Página abierta para editar.');
-      window.scrollTo({top:0,behavior:'smooth'});
-    });
-    wrap.append(day,title,preview); if(photo) wrap.append(photo); wrap.append(open); root.append(wrap);
+    const title = document.createElement('h3'); title.textContent = item.title || (currentSection==='poems'?'Un poema sin título':currentSection==='thoughts'?'Un pensamiento':'Un recuerdo');
+    const excerpt = document.createElement('p'); excerpt.className='page-excerpt';
+    excerpt.textContent = (item.text || '').slice(0,150) + ((item.text || '').length>150?'…':'');
+    page.append(day,title,excerpt);
+    if(item.photoData){ const photo=document.createElement('img'); photo.className='entry-photo'; photo.src=item.photoData; photo.alt='Fotografía de esta página'; page.append(photo); }
+    const open = document.createElement('button'); open.type='button'; open.textContent='Leer esta página'; open.addEventListener('click',()=>readSavedPage(index));
+    page.append(open); root.append(page);
   });
+}
+function readSavedPage(index){
+  const record = currentRenderedPages[index];
+  if(!record) return;
+  const {id,item,legacy} = record;
+  const reader = document.getElementById('bookReader');
+  const root = document.getElementById('entriesList');
+  reader.replaceChildren();
+  reader.classList.remove('hidden');
+  root.classList.add('hidden');
+  const page = document.createElement('article'); page.className='reader-page';
+  const date = document.createElement('div'); date.className='entry-date'; date.textContent = item.date || id;
+  const lunar = document.createElement('div'); lunar.className='entry-date'; lunar.style.color='#f0cb68'; lunar.textContent='☾ '+lunarPhaseName(item.date || id);
+  const title = document.createElement('h3'); title.textContent = item.title || (currentSection==='poems'?'Un poema sin título':currentSection==='thoughts'?'Un pensamiento':'Un recuerdo');
+  const body = document.createElement('div'); body.className='reader-text'; body.textContent = item.text || '';
+  page.append(date,lunar,title);
+  if(item.photoData){ const photo=document.createElement('img'); photo.className='entry-photo'; photo.src=item.photoData; photo.alt='Fotografía guardada en esta página'; page.append(photo); }
+  page.append(body);
+  const actions = document.createElement('div'); actions.className='reader-actions';
+  const previous = document.createElement('button'); previous.className='secondary'; previous.type='button'; previous.textContent='← Página anterior'; previous.disabled=index>=currentRenderedPages.length-1; previous.addEventListener('click',()=>readSavedPage(index+1));
+  const next = document.createElement('button'); next.className='secondary'; next.type='button'; next.textContent='Página siguiente →'; next.disabled=index<=0; next.addEventListener('click',()=>readSavedPage(index-1));
+  const edit = document.createElement('button'); edit.type='button'; edit.textContent='Editar esta página'; edit.addEventListener('click',()=>{
+    document.getElementById('entryDate').value = item.date || id;
+    updateLunarPhase(document.getElementById('entryDate').value);
+    document.getElementById('entryTitle').value = item.title || '';
+    document.getElementById('entryText').value = item.text || '';
+    selectedPhotoData = null; existingPhotoData = item.photoData || null;
+    document.getElementById('entryPhoto').value = '';
+    updatePhotoPreview(existingPhotoData);
+    editingPageId = legacy ? null : id;
+    showStatus(saveStatus, legacy ? 'Este recuerdo antiguo se conserva intacto. Si lo guardas, se creará una nueva página en Recuerdos.' : 'Página abierta para editar.');
+    reader.classList.add('hidden'); root.classList.remove('hidden');
+    window.scrollTo({top:0,behavior:'smooth'});
+  });
+  const back = document.createElement('button'); back.className='secondary'; back.type='button'; back.textContent='Volver al libro'; back.addEventListener('click',()=>{reader.classList.add('hidden');root.classList.remove('hidden');});
+  actions.append(previous,next,edit,back);
+  reader.append(page,actions);
+  window.scrollTo({top:reader.getBoundingClientRect().top+window.scrollY-20,behavior:'smooth'});
+}
+function lunarPhaseName(dateString){
+  if(!dateString) return 'Fase lunar aproximada';
+  const parts=dateString.split('-').map(Number);
+  const day=Date.UTC(parts[0],parts[1]-1,parts[2],12);
+  const knownNewMoon=Date.UTC(2000,0,6,18,14);
+  const month=29.530588853;
+  const age=((day-knownNewMoon)/86400000%month+month)%month;
+  const names=['Luna nueva','Luna creciente','Cuarto creciente','Luna gibosa creciente','Luna llena','Luna gibosa menguante','Cuarto menguante','Luna menguante'];
+  return names[Math.floor((age/month*8)+0.5)%8]+' · fase aproximada';
 }
 function friendlyError(err){
   const code = err && err.code;
