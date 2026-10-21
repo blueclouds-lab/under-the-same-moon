@@ -522,6 +522,7 @@ function readSavedPage(index){
     updatePhotoPreview(existingPhotoData);
     editingPageId = legacy ? null : id;
     showStatus(saveStatus, legacy ? 'Este recuerdo antiguo se conserva intacto. Si lo guardas, se creará una nueva página en Recuerdos.' : 'Página abierta para editar.');
+    journalPanel.classList.remove('section-only-view'); writeSectionButton.classList.add('hidden');
     reader.classList.add('hidden'); root.classList.remove('hidden');
     window.scrollTo({top:0,behavior:'smooth'});
   });
