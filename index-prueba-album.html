@@ -1337,7 +1337,6 @@ function friendlyError(err){
  };
  let currentMessage=messages[mood.value][0];
  function say(t){if(status)status.textContent=t;}
- renderConstellation();
  function showPerseid(){
    if(!messageCard)return;
    messageCard.classList.remove('meteor-active','meteor-glow');
@@ -1420,6 +1419,7 @@ function friendlyError(err){
      actions.append(relight,share);card.append(date,textEl,actions);universeList.appendChild(card);
    });
  }
+ renderConstellation();
  document.getElementById('thinkingUseCustomMessage').addEventListener('click',()=>{
    const value=(customText?.value||'').trim();
    if(!value){say('Escribe primero unas palabras para regalarle tu estrella. 💙');customText?.focus();return;}
