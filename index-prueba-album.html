@@ -1383,8 +1383,47 @@ function friendlyError(err){
  const starPoints=[[38,42],[84,26],[126,52],[172,30],[224,48],[278,32],[294,91],[247,119],[198,91],[155,128],[108,103],[55,135],[78,177],[143,183],[209,166],[267,185]];
  const starLinks=[[0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,7],[7,8],[8,9],[9,10],[10,11],[11,12],[12,13],[13,14],[14,15],[2,10],[4,8],[8,14]];
  let savedStars=[];
+ let starCloudRef=null, starCloudReady=false, starCloudListener=null;
  try{const stored=JSON.parse(localStorage.getItem(starStorageKey)||'[]');if(Array.isArray(stored))savedStars=stored.filter(s=>s&&typeof s.text==='string').slice(-100);}catch(_){}
- function saveStars(){try{localStorage.setItem(starStorageKey,JSON.stringify(savedStars));return true;}catch(_){say('No se ha podido guardar en este navegador. Puedes copiar el mensaje para conservarlo.');return false;}}
+ function saveStars(){
+   try{localStorage.setItem(starStorageKey,JSON.stringify(savedStars));}
+   catch(_){say('No se ha podido guardar en este navegador. Puedes copiar el mensaje para conservarlo.');return false;}
+   if(starCloudRef&&starCloudReady){
+     starCloudRef.set(savedStars).catch(err=>say('La estrella se guardó en este dispositivo, pero no se pudo sincronizar con Firebase: '+err.message));
+   }
+   return true;
+ }
+ function connectStarCloud(user){
+   if(starCloudRef&&starCloudListener){starCloudRef.off('value',starCloudListener);}
+   starCloudRef=null;starCloudReady=false;starCloudListener=null;
+   if(!user||!db)return;
+   const ref=db.ref('users/'+user.uid+'/starUniverse');
+   ref.once('value').then(snap=>{
+     if(!currentUser||currentUser.uid!==user.uid)return;
+     const cloud=snap.val();
+     const remote=Array.isArray(cloud)?cloud.filter(s=>s&&typeof s.text==='string'):[];
+     const byText=new Map();
+     [...remote,...savedStars].forEach(s=>{if(s&&typeof s.text==='string'&&!byText.has(s.text))byText.set(s.text,s);});
+     savedStars=Array.from(byText.values()).slice(-100);
+     starCloudRef=ref;
+     try{localStorage.setItem(starStorageKey,JSON.stringify(savedStars));}catch(_){}
+     starCloudReady=true;
+     ref.set(savedStars).catch(err=>say('No se pudo sincronizar el universo todavía: '+err.message));
+     starCloudListener=ref.on('value',next=>{
+       if(!starCloudReady||!currentUser||currentUser.uid!==user.uid)return;
+       const value=next.val();
+       if(!Array.isArray(value))return;
+       savedStars=value.filter(s=>s&&typeof s.text==='string').slice(-100);
+       try{localStorage.setItem(starStorageKey,JSON.stringify(savedStars));}catch(_){}
+       renderConstellation();
+     },err=>say('No se pudieron actualizar las estrellas desde la nube: '+err.message));
+     renderConstellation();
+     say('Tu universo de estrellas está conectado a tu cuenta y puede sincronizarse entre dispositivos. 🌙');
+   }).catch(err=>say('No se pudo conectar el universo a Firebase: '+err.message));
+ }
+ if(auth&&typeof auth.onAuthStateChanged==='function'){
+   auth.onAuthStateChanged(user=>connectStarCloud(user));
+ }
  function renderConstellation(){
    if(!constellationSvg||!universeList)return;
    constellationSvg.replaceChildren();
