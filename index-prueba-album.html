@@ -613,7 +613,7 @@ function albumRenderPhotos(){
       catch(err){albumStatus('No se pudo eliminar: '+friendlyError(err));del.disabled=false;}
     });
     card.append(img,info,size,view,del);grid.appendChild(card);
-    albumImageRef.child(id).once('value').then(snap=>{const val=snap.val();if(val&&val.dataUrl)img.src=val.dataUrl;}).catch(()=>{});
+    /* Las imágenes no se descargan hasta que la usuaria pulse «Abrir captura», para ahorrar datos. */
   });
 }
 function albumListenForUser(user){
