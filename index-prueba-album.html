@@ -43,6 +43,23 @@ label{display:block;font-size:17px;font-style:italic;color:#c8c5d0;margin:13px 0
 .album-note{font-size:15px;color:#aaaabd;line-height:1.45}
 @media(min-width:600px){.album-controls.two{grid-template-columns:1fr 1fr}}
 
+
+/* Cuenta atrás romántica: independiente de los datos del diario */
+.countdown-panel{margin:24px 0;padding:22px 16px;border:1px solid #66583f;border-radius:20px;background:radial-gradient(ellipse at 50% 0%,rgba(126,119,157,.2),transparent 65%),linear-gradient(145deg,#171b2d,#202033);text-align:center;overflow:hidden}
+.countdown-panel h2{font-family:'Parisienne',cursive;color:var(--gold);font-size:clamp(32px,6vw,44px);font-weight:400;margin:0 0 4px}
+.countdown-intro{max-width:520px;margin:0 auto 16px;color:var(--muted);font-style:italic}
+.countdown-quote{min-height:28px;color:#e8d5a5;font-style:italic;margin:16px 0 10px}
+.countdown-units{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;max-width:540px;margin:16px auto}
+.countdown-unit{padding:12px 4px;border:1px solid rgba(240,203,104,.22);border-radius:12px;background:rgba(255,255,255,.035)}
+.countdown-number{display:block;color:#f0cb68;font-family:Georgia,serif;font-size:clamp(25px,6vw,38px);font-variant-numeric:tabular-nums}
+.countdown-label{display:block;color:#aaaabd;font-size:11px;letter-spacing:.12em}
+.countdown-editor{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;max-width:560px;margin:16px auto 0;text-align:left}
+.countdown-editor input{width:100%}
+.countdown-actions{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:12px}
+.countdown-status{min-height:22px;color:#c7c1d4;font-size:15px;margin:8px 0 0}
+@media(max-width:420px){.countdown-panel{padding:18px 10px}.countdown-units{gap:5px}.countdown-unit{padding:10px 2px}.countdown-label{font-size:9px}}
+@media(prefers-reduced-motion:reduce){.countdown-panel *{scroll-behavior:auto!important}}
+
 </style>
 </head>
 <body>
@@ -131,6 +148,31 @@ label{display:block;font-size:17px;font-style:italic;color:#c8c5d0;margin:13px 0
       <p class="hint" style="text-align:center">Toca una estrella para abrir la captura que guarda.</p>
       <div id="albumConstellationGrid" class="constellation-grid"></div>
     </section>
+  </section>
+
+
+  <section class="share-panel lunar-calendar countdown-panel" id="hugCountdownPanel" aria-labelledby="hugCountdownHeading">
+    <div aria-hidden="true" style="font-size:30px;color:#f0cb68;letter-spacing:.35em">☾ ✦ ☽</div>
+    <h2 id="hugCountdownHeading">Nuestro próximo abrazo</h2>
+    <p class="countdown-intro">«Cada día que pasa es un día menos para volver a abrazarnos.»</p>
+    <p class="hint" id="hugCountdownIntro">Todavía no hay una fecha elegida. No hay prisa; puedes añadirla cuando la sepas. 💙</p>
+    <div class="countdown-units" id="hugCountdownUnits" aria-live="polite">
+      <div class="countdown-unit"><span class="countdown-number">—</span><span class="countdown-label">DÍAS</span></div>
+      <div class="countdown-unit"><span class="countdown-number">—</span><span class="countdown-label">HORAS</span></div>
+      <div class="countdown-unit"><span class="countdown-number">—</span><span class="countdown-label">MINUTOS</span></div>
+      <div class="countdown-unit"><span class="countdown-number">—</span><span class="countdown-label">SEGUNDOS</span></div>
+    </div>
+    <p class="countdown-quote" id="hugCountdownPhrase">Mientras tanto, la Luna sigue acompañando la espera.</p>
+    <div class="countdown-editor">
+      <div><label for="hugCountdownDate">Fecha del abrazo</label><input id="hugCountdownDate" type="date"></div>
+      <div><label for="hugCountdownTime">Hora (si la sabes)</label><input id="hugCountdownTime" type="time" value="12:00"></div>
+    </div>
+    <div class="countdown-actions">
+      <button type="button" id="hugCountdownSave">Guardar fecha</button>
+      <button type="button" class="secondary" id="hugCountdownChange">Cambiar fecha</button>
+      <button type="button" class="secondary" id="hugCountdownClear">Dejar sin fecha</button>
+    </div>
+    <p class="countdown-status" id="hugCountdownStatus" role="status" aria-live="polite"></p>
   </section>
 
   <section class="share-panel lunar-calendar" aria-labelledby="calendarHeading">
@@ -808,5 +850,92 @@ function friendlyError(err){
   return (err && err.message) || 'Ha ocurrido un error. Inténtalo de nuevo.';
 }
 </script>
+
+<script>
+/* Cuenta atrás local: no escribe ni modifica nada en Firebase. */
+(function(){
+  const storageKey = 'underSameMoon.hugCountdown.v1';
+  const dateInput = document.getElementById('hugCountdownDate');
+  const timeInput = document.getElementById('hugCountdownTime');
+  const saveButton = document.getElementById('hugCountdownSave');
+  const changeButton = document.getElementById('hugCountdownChange');
+  const clearButton = document.getElementById('hugCountdownClear');
+  const units = document.getElementById('hugCountdownUnits');
+  const intro = document.getElementById('hugCountdownIntro');
+  const phrase = document.getElementById('hugCountdownPhrase');
+  const status = document.getElementById('hugCountdownStatus');
+  if(!dateInput || !units) return;
+  let target = null;
+  function readSaved(){
+    try{
+      const saved = JSON.parse(localStorage.getItem(storageKey) || 'null');
+      if(saved && /^\d{4}-\d{2}-\d{2}$/.test(saved.date)){
+        dateInput.value = saved.date;
+        timeInput.value = saved.time || '12:00';
+        target = new Date(saved.date + 'T' + (saved.time || '12:00') + ':00');
+        if(Number.isNaN(target.getTime())) target = null;
+      }
+    }catch(e){ target = null; }
+  }
+  function renderNumbers(values){
+    const labels = ['DÍAS','HORAS','MINUTOS','SEGUNDOS'];
+    units.innerHTML = values.map((n,i)=>'<div class="countdown-unit"><span class="countdown-number">'+n+'</span><span class="countdown-label">'+labels[i]+'</span></div>').join('');
+  }
+  function update(){
+    if(!target){
+      renderNumbers(['—','—','—','—']);
+      intro.textContent = 'Todavía no hay una fecha elegida. No hay prisa; puedes añadirla cuando la sepas. 💙';
+      phrase.textContent = 'Mientras tanto, la Luna sigue acompañando la espera.';
+      return;
+    }
+    const diff = target.getTime() - Date.now();
+    if(diff <= 0){
+      renderNumbers(['0','0','0','0']);
+      intro.textContent = 'Ha llegado el momento que esperabas. Ojalá ese abrazo dure muchísimo. 💙';
+      phrase.textContent = 'Hoy la distancia se hace pequeña. Es hora de abrazarse. ✨';
+      return;
+    }
+    const total = Math.floor(diff/1000);
+    const days = Math.floor(total/86400);
+    const hours = Math.floor((total%86400)/3600);
+    const minutes = Math.floor((total%3600)/60);
+    const seconds = total%60;
+    renderNumbers([days,hours,minutes,seconds].map(n=>String(n).padStart(2,'0')));
+    intro.textContent = 'Cada segundo nos acerca un poquito más.';
+    if(days > 30) phrase.textContent = 'Cada día que pasa es un día menos para volver a abrazarnos. ☾';
+    else if(days > 7) phrase.textContent = 'Un día menos de espera, un poquito más cerca. ✨';
+    else if(days > 1) phrase.textContent = 'Ya queda menos; pronto ese abrazo dejará de ser un deseo. 💫';
+    else if(days === 1) phrase.textContent = '¡Mañana puede ser el día de ese abrazo tan esperado! 💙';
+    else phrase.textContent = 'Ya casi… que el reloj vuele hasta ese abrazo. 🌙';
+  }
+  function saveDate(){
+    const date = dateInput.value;
+    const time = timeInput.value || '12:00';
+    if(!date){ status.textContent = 'Elige una fecha para empezar la cuenta atrás, cuando estés preparada.'; return; }
+    const candidate = new Date(date + 'T' + time + ':00');
+    if(Number.isNaN(candidate.getTime())){ status.textContent = 'Revisa la fecha y la hora, por favor.'; return; }
+    if(candidate.getTime() <= Date.now()){ status.textContent = 'Esa fecha ya ha pasado. Elige el día de vuestro próximo abrazo.'; return; }
+    target = candidate;
+    try{ localStorage.setItem(storageKey, JSON.stringify({date,time})); }catch(e){}
+    status.textContent = 'La fecha está guardada en este dispositivo. Puedes cambiarla cuando quieras. 💙';
+    update();
+  }
+  saveButton.addEventListener('click',saveDate);
+  changeButton.addEventListener('click',function(){ dateInput.focus(); status.textContent = 'Elige la nueva fecha y pulsa «Guardar fecha».'; });
+  clearButton.addEventListener('click',function(){
+    target = null;
+    dateInput.value = '';
+    timeInput.value = '12:00';
+    try{ localStorage.removeItem(storageKey); }catch(e){}
+    status.textContent = 'La cuenta atrás queda sin fecha. Tus recuerdos no se han tocado.';
+    update();
+  });
+  readSaved();
+  if(target) status.textContent = 'Tu fecha está guardada. Puedes cambiarla cuando quieras.';
+  update();
+  window.setInterval(update,1000);
+})();
+</script>
+
 </body>
 </html>
