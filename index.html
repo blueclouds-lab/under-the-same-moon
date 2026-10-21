@@ -10,7 +10,7 @@
 *{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);background:radial-gradient(ellipse at 15% 5%,#fff 0,transparent 32%),linear-gradient(145deg,#eaf5ff,#d6eaff 55%,#f4f8ff);padding:22px 14px 48px}
 main{max-width:800px;margin:auto}.hero{text-align:center;padding:28px 12px 26px}.moon{font-size:48px;line-height:1.2;color:#f2c94c;text-shadow:0 0 8px #ffe9a6,0 4px 18px #e8c85b88}.eyebrow{letter-spacing:.18em;text-transform:uppercase;font-size:11px;color:#6486a7;margin:12px 0 8px}h1{font-family:Georgia,serif;font-weight:400;font-size:clamp(32px,7vw,48px);margin:0;color:#365f86} .subtitle{font-family:Georgia,serif;font-style:italic;color:#6486a7;margin:10px 0 0;font-size:16px}
 .card{position:relative;overflow:hidden;background:linear-gradient(90deg,#e9dfc8 0,#f8f2e4 13px,#fffdf5 14px,#fffdf8 100%);border:1px solid #d8d0bd;border-radius:8px 20px 20px 8px;padding:clamp(22px,5vw,34px) clamp(20px,5vw,38px) clamp(22px,5vw,34px) clamp(30px,6vw,48px);box-shadow:inset 5px 0 7px #9c8b6b22,0 14px 0 -7px #c5d7e8,0 20px 35px #53799b26;margin:20px 0} .card:after{content:"";position:absolute;left:14px;top:0;bottom:0;width:1px;background:#d9c9a9;opacity:.8;pointer-events:none}h2{font-family:Georgia,serif;font-weight:400;color:#416b91;margin:0 0 16px;font-size:23px}.hint{font-size:13px;line-height:1.55;color:#71869a}
-label{display:block;font-size:13px;color:#56718b;margin:13px 0 7px}input,textarea{width:100%;border:1px solid #d8e2ed;border-radius:5px;background:#fffefa;padding:12px 13px;font:inherit;color:var(--ink);outline-color:#8ab8e7;box-shadow:inset 0 1px 2px #64748b0b}textarea{min-height:220px;resize:vertical;line-height:1.8;background-image:repeating-linear-gradient(to bottom,transparent 0,transparent 30px,#dce7f1 31px);background-attachment:local}button{border:0;border-radius:999px;padding:12px 18px;background:#729fce;color:#fff;font:inherit;cursor:pointer;margin:12px 7px 0 0}button.secondary{background:#e8f2fc;color:#466d94}button:disabled{opacity:.5;cursor:wait}.row{display:flex;gap:12px;flex-wrap:wrap}.row>div{flex:1;min-width:170px}.status{font-size:13px;min-height:20px;margin-top:12px;color:#527da6}.hidden{display:none!important}.entry-item{border-top:1px solid #d8e2ed;padding:14px 0;white-space:pre-wrap;background:linear-gradient(to bottom,transparent 0,transparent 31px,#e8edf2 32px);line-height:1.7}.entry-date{font-size:12px;color:#7294b4;margin-bottom:5px}.footer{text-align:center;font-size:12px;color:#7a96b1;padding:20px}
+label{display:block;font-size:13px;color:#56718b;margin:13px 0 7px}input,textarea{width:100%;border:1px solid #d8e2ed;border-radius:5px;background:#fffefa;padding:12px 13px;font:inherit;color:var(--ink);outline-color:#8ab8e7;box-shadow:inset 0 1px 2px #64748b0b}textarea{min-height:220px;resize:vertical;line-height:1.8;background-image:repeating-linear-gradient(to bottom,transparent 0,transparent 30px,#dce7f1 31px);background-attachment:local}button{border:0;border-radius:999px;padding:12px 18px;background:#729fce;color:#fff;font:inherit;cursor:pointer;margin:12px 7px 0 0}button.secondary{background:#e8f2fc;color:#466d94}button:disabled{opacity:.5;cursor:wait}.row{display:flex;gap:12px;flex-wrap:wrap}.row>div{flex:1;min-width:170px}.status{font-size:13px;min-height:20px;margin-top:12px;color:#527da6}.book-tabs{display:flex;gap:7px;flex-wrap:wrap;margin:20px 0 16px;border-bottom:1px solid #d8d0bd;padding-bottom:10px}.book-tabs .tab-button{margin:0;background:#e6eef7;color:#557596;border-radius:10px 10px 3px 3px;padding:10px 15px}.book-tabs .tab-button.active{background:#f2c94c;color:#5b4a1b;box-shadow:0 -2px 0 #e4b62e inset}.book-heading{font-family:Georgia,serif;font-size:25px;color:#416b91;margin:12px 0 18px}.hidden{display:none!important}.entry-item{border-top:1px solid #d8e2ed;padding:14px 0;white-space:pre-wrap;background:linear-gradient(to bottom,transparent 0,transparent 31px,#e8edf2 32px);line-height:1.7}.entry-date{font-size:12px;color:#7294b4;margin-bottom:5px}.footer{text-align:center;font-size:12px;color:#7a96b1;padding:20px}
 </style>
 </head>
 <body>
@@ -41,19 +41,25 @@ label{display:block;font-size:13px;color:#56718b;margin:13px 0 7px}input,textare
     <h2 style="margin:0">Mi diario lunar</h2>
     <button class="secondary" id="logoutButton" type="button">Cerrar sesión</button>
   </div>
-  <p class="hint">Elige un día para escribir o revisar lo que guardaste. Tus cambios se guardan al pulsar el botón.</p>
-  <label for="entryDate">Día de tu recuerdo</label>
+  <p class="hint">Tu libro está dividido en rincones. Elige una pestaña y escribe sin prisa; puedes guardar tantos textos como quieras.</p>
+  <nav class="book-tabs" aria-label="Secciones de tu libro">
+    <button type="button" class="tab-button active" data-section="poems">Poemas</button>
+    <button type="button" class="tab-button" data-section="thoughts">Pensamientos</button>
+    <button type="button" class="tab-button" data-section="memories">Recuerdos</button>
+  </nav>
+  <div class="book-heading" id="sectionHeading">Mis poemas</div>
+  <label for="entryDate">Fecha</label>
   <input id="entryDate" type="date">
-  <label for="entryTitle">Un título para este momento (opcional)</label>
-  <input id="entryTitle" type="text" maxlength="120" placeholder="Por ejemplo: Un día tranquilo">
-  <label for="entryText">Lo que quieras dejar escrito</label>
-  <textarea id="entryText" placeholder="Aquí caben tus pensamientos, tus emociones y tus recuerdos…"></textarea>
-  <button id="saveButton" type="button">Guardar este recuerdo</button>
-  <button class="secondary" id="clearButton" type="button">Vaciar el editor</button>
+  <label for="entryTitle">Título</label>
+  <input id="entryTitle" type="text" maxlength="120" placeholder="Ponle un nombre a estas palabras…">
+  <label for="entryText">Tu página en blanco</label>
+  <textarea id="entryText" placeholder="Deja que las palabras encuentren su lugar…"></textarea>
+  <button id="saveButton" type="button">Guardar en mi libro</button>
+  <button class="secondary" id="clearButton" type="button">Empezar una página nueva</button>
   <p class="status" id="saveStatus" role="status"></p>
   <div style="margin-top:26px">
-    <h2>Recuerdos guardados</h2>
-    <div id="entriesList"><p class="hint">Tus recuerdos aparecerán aquí cuando guardes el primero.</p></div>
+    <h2 id="entriesHeading">Poemas escritos</h2>
+    <div id="entriesList"><p class="hint">Tus páginas aparecerán aquí cuando guardes la primera.</p></div>
   </div>
 </section>
 <footer class="footer">Hecho con calma, bajo la misma luna ☾</footer>
@@ -77,8 +83,9 @@ const loginStatus = document.getElementById('loginStatus');
 const saveStatus = document.getElementById('saveStatus');
 const loginButton = document.getElementById('loginButton');
 const saveButton = document.getElementById('saveButton');
-let auth = null, db = null, currentUser = null, entriesRef = null, entriesCache = {};
+let auth = null, db = null, currentUser = null, entriesRef = null, pagesRef = null, entriesCache = {}, pagesCache = {}, currentSection = 'poems', editingPageId = null;
 
+const sectionNames = { poems: 'Mis poemas', thoughts: 'Mis pensamientos', memories: 'Mis recuerdos' };
 function showStatus(el, message){ el.textContent = message; }
 function todayLocal(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 document.getElementById('entryDate').value = todayLocal();
@@ -98,14 +105,13 @@ if (!configReady) {
       journalPanel.classList.toggle('hidden', !user);
       if(user){
         entriesRef = db.ref('users/' + user.uid + '/entries');
-        entriesRef.on('value', snap => {
-          entriesCache = snap.val() || {};
-          renderEntries();
-          loadSelectedDate();
-        }, err => showStatus(saveStatus, 'No se pudieron cargar los recuerdos: ' + err.message));
+        pagesRef = db.ref('users/' + user.uid + '/bookPages');
+        entriesRef.on('value', snap => { entriesCache = snap.val() || {}; renderEntries(); }, err => showStatus(saveStatus, 'No se pudieron cargar los recuerdos: ' + err.message));
+        pagesRef.on('value', snap => { pagesCache = snap.val() || {}; renderEntries(); }, err => showStatus(saveStatus, 'No se pudieron cargar las páginas: ' + err.message));
       } else {
         if(entriesRef) entriesRef.off();
-        entriesRef = null; entriesCache = {};
+        if(pagesRef) pagesRef.off();
+        entriesRef = null; pagesRef = null; entriesCache = {}; pagesCache = {};
       }
     });
   } catch(err) { showStatus(loginStatus, 'No se pudo iniciar Firebase: ' + err.message); }
@@ -125,46 +131,70 @@ document.getElementById('resetButton').addEventListener('click', async () => {
   catch(err) { showStatus(loginStatus, friendlyError(err)); }
 });
 document.getElementById('logoutButton').addEventListener('click', () => auth && auth.signOut());
-document.getElementById('entryDate').addEventListener('change', loadSelectedDate);
-function loadSelectedDate(){
-  const date = document.getElementById('entryDate').value;
-  const item = entriesCache[date] || {};
-  document.getElementById('entryTitle').value = item.title || '';
-  document.getElementById('entryText').value = item.text || '';
-  showStatus(saveStatus, item.text || item.title ? 'Recuerdo de este día cargado.' : '');
-}
+document.getElementById('entryDate').addEventListener('change', () => { editingPageId = null; });
+document.querySelectorAll('.tab-button').forEach(button => button.addEventListener('click', () => {
+  currentSection = button.dataset.section;
+  editingPageId = null;
+  document.querySelectorAll('.tab-button').forEach(tab => tab.classList.toggle('active', tab === button));
+  document.getElementById('sectionHeading').textContent = sectionNames[currentSection];
+  document.getElementById('entriesHeading').textContent = sectionNames[currentSection] + ' escritos';
+  document.getElementById('entryTitle').value = '';
+  document.getElementById('entryText').value = '';
+  document.getElementById('entryText').placeholder = currentSection === 'poems' ? 'Deja que las palabras encuentren su lugar…' : currentSection === 'thoughts' ? 'Escribe aquí lo que llevas dentro…' : 'Guarda aquí los momentos que quieras conservar…';
+  showStatus(saveStatus, '');
+  renderEntries();
+}));
 document.getElementById('saveButton').addEventListener('click', async () => {
   if(!currentUser || !db) return;
   const date = document.getElementById('entryDate').value;
   const title = document.getElementById('entryTitle').value.trim();
-  const text = document.getElementById('entryText').value.trim();
+  const bodyText = document.getElementById('entryText').value.trim();
   if(!date){ showStatus(saveStatus, 'Elige una fecha antes de guardar.'); return; }
-  if(!title && !text){ showStatus(saveStatus, 'Escribe un título o un recuerdo antes de guardar.'); return; }
-  saveButton.disabled = true; showStatus(saveStatus, 'Guardando tu recuerdo…');
+  if(!title && !bodyText){ showStatus(saveStatus, 'Escribe un título o unas palabras antes de guardar.'); return; }
+  saveButton.disabled = true; showStatus(saveStatus, 'Guardando la página de tu libro…');
   try {
-    await db.ref('users/' + currentUser.uid + '/entries/' + date).set({ title, text, updatedAt: Date.now() });
-    showStatus(saveStatus, 'Recuerdo guardado en tu espacio privado. ☾');
+    const collection = db.ref('users/' + currentUser.uid + '/bookPages/' + currentSection);
+    const payload = { title, text: bodyText, date, updatedAt: Date.now() };
+    if(editingPageId) await collection.child(editingPageId).set(payload);
+    else await collection.push(payload);
+    editingPageId = null;
+    showStatus(saveStatus, 'Tu página se ha guardado en el libro. ☾');
+    document.getElementById('entryTitle').value = '';
+    document.getElementById('entryText').value = '';
   } catch(err) { showStatus(saveStatus, 'No se pudo guardar: ' + friendlyError(err)); }
   finally { saveButton.disabled = false; }
 });
 document.getElementById('clearButton').addEventListener('click', () => {
+  editingPageId = null;
   document.getElementById('entryTitle').value = '';
   document.getElementById('entryText').value = '';
-  showStatus(saveStatus, 'Editor vacío. Esto no borra el recuerdo que ya esté guardado.');
+  document.getElementById('entryDate').value = todayLocal();
+  showStatus(saveStatus, 'Página nueva lista para escribir. Esto no borra ninguna página guardada.');
 });
 function renderEntries(){
   const root = document.getElementById('entriesList');
-  const dates = Object.keys(entriesCache).sort((a,b)=>b.localeCompare(a));
-  if(!dates.length){ root.innerHTML='<p class="hint">Tus recuerdos aparecerán aquí cuando guardes el primero.</p>'; return; }
+  const pages = pagesCache[currentSection] || {};
+  const list = Object.entries(pages).map(([id,item])=>({id,item,legacy:false}));
+  if(currentSection === 'memories'){
+    Object.entries(entriesCache).forEach(([date,item])=>list.push({id:date,item:{...item,date},legacy:true}));
+  }
+  list.sort((a,b)=>(b.item.date || b.id).localeCompare(a.item.date || a.id));
+  if(!list.length){ root.innerHTML='<p class="hint">Esta parte de tu libro está esperando tus palabras. 💛</p>'; return; }
   root.replaceChildren();
-  dates.forEach(date => {
-    const item = entriesCache[date] || {};
+  list.forEach(({id,item,legacy}) => {
     const wrap = document.createElement('div'); wrap.className='entry-item';
-    const day = document.createElement('div'); day.className='entry-date'; day.textContent = date;
-    const title = document.createElement('strong'); title.textContent = item.title || 'Un recuerdo sin título';
-    const preview = document.createElement('p'); preview.style.margin='6px 0'; preview.textContent = (item.text || '').slice(0,180) + ((item.text || '').length>180?'…':'');
-    const open = document.createElement('button'); open.className='secondary'; open.type='button'; open.textContent='Abrir este día';
-    open.addEventListener('click',()=>{ document.getElementById('entryDate').value=date; loadSelectedDate(); window.scrollTo({top:0,behavior:'smooth'}); });
+    const day = document.createElement('div'); day.className='entry-date'; day.textContent = item.date || id;
+    const title = document.createElement('strong'); title.textContent = item.title || (currentSection==='poems'?'Un poema sin título':currentSection==='thoughts'?'Un pensamiento':'Un recuerdo');
+    const preview = document.createElement('p'); preview.style.margin='6px 0'; preview.textContent = (item.text || '').slice(0,220) + ((item.text || '').length>220?'…':'');
+    const open = document.createElement('button'); open.className='secondary'; open.type='button'; open.textContent='Abrir y editar';
+    open.addEventListener('click',()=>{
+      document.getElementById('entryDate').value = item.date || id;
+      document.getElementById('entryTitle').value = item.title || '';
+      document.getElementById('entryText').value = item.text || '';
+      editingPageId = legacy ? null : id;
+      showStatus(saveStatus, legacy ? 'Este recuerdo antiguo se conserva intacto. Si lo guardas, se creará una nueva página en Recuerdos.' : 'Página abierta para editar.');
+      window.scrollTo({top:0,behavior:'smooth'});
+    });
     wrap.append(day,title,preview,open); root.append(wrap);
   });
 }
