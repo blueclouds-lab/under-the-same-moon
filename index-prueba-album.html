@@ -112,6 +112,11 @@ label{display:block;font-size:17px;font-style:italic;color:#c8c5d0;margin:13px 0
 .thinking-message>*:not(.thinking-sky){position:relative;z-index:1}
 #thinkingMessageText{transition:color .45s,text-shadow .45s}
 .thinking-message.meteor-glow #thinkingMessageText{color:#fff0c1;text-shadow:0 0 9px #f0cb6877,0 0 22px #f0cb683d}
+.perseid-dedication{max-width:440px;margin:25px auto 0;padding:17px 10px 2px;border-top:1px solid #f0cb6844;color:#e7dfd0}
+.perseid-dedication-star{display:block;margin-bottom:8px;color:#f5d98a;font-size:25px;text-shadow:0 0 12px #f0cb68aa}
+.perseid-dedication p{margin:5px 0;font-size:14px;line-height:1.7;font-style:italic}
+.perseid-dedication p:first-of-type{color:#f5e5b8}
+@media(prefers-reduced-motion:reduce){.perseid-dedication-star{text-shadow:none}}
 @keyframes perseidsCross{0%{left:-12%;top:12%;opacity:0;transform:translate(0,0) rotate(-25deg) scale(.7)}12%{opacity:1}68%{opacity:1}100%{left:112%;top:78%;opacity:0;transform:translate(0,0) rotate(-25deg) scale(1.15)}}
 @media(prefers-reduced-motion:reduce){.thinking-message.meteor-active .thinking-sky:before,.thinking-message.meteor-active .thinking-sky:after{animation:none;display:none}.thinking-message.meteor-glow #thinkingMessageText{transition:none}}
 
@@ -245,6 +250,11 @@ label{display:block;font-size:17px;font-style:italic;color:#c8c5d0;margin:13px 0
       <div class="moon" aria-hidden="true">☾</div>
       <p id="thinkingMessageText" role="status" aria-live="polite">Aunque hoy nos separen kilómetros, hay una parte de mí que siempre encuentra el camino hasta ti. Te echo de menos. 💙</p>
       <p style="color:#c8c5d0;font-style:italic">— Under the same Moon ✨</p>
+      <div class="perseid-dedication" aria-label="El significado de la estrella fugaz">
+        <span class="perseid-dedication-star" aria-hidden="true">✧</span>
+        <p>Regalarle al otro una pequeña estrella fugaz.</p>
+        <p>Un deseo que viaja de una persona a otra, bajo la misma Luna.</p>
+      </div>
     </div>
     <div class="thinking-actions">
       <button type="button" id="thinkingNewMessage">Otro mensaje</button>
