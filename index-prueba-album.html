@@ -94,6 +94,8 @@ label{display:block;font-size:17px;font-style:italic;color:#c8c5d0;margin:13px 0
 .special-letter-card{border:1px solid #6a6177;border-radius:14px;padding:16px;margin:12px 0;text-align:left;background:linear-gradient(145deg,#292b3c,#202230);box-shadow:0 8px 22px #0002}
 .special-letter-card h3{font-family:"Parisienne",cursive;color:var(--gold);font-size:28px;font-weight:400;margin:4px 0}
 .special-letter-card .letter-envelope{font-size:28px;color:var(--gold)}
+.letter-share-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.letter-share-actions button{flex:1;min-width:130px}
 .special-letter-body{white-space:pre-wrap;line-height:1.8;padding:14px 4px 2px;border-top:1px solid #48495a;margin-top:12px}
 .special-letter-empty{color:#c4b5d0;padding:16px}
 @media(prefers-reduced-motion:reduce){.special-letter-card *{scroll-behavior:auto!important}}
@@ -1072,7 +1074,40 @@ function friendlyError(err){
      const open=document.createElement('button');open.type='button';open.textContent='Abrir carta';
      const body=document.createElement('div');body.className='special-letter-body';body.hidden=true;body.textContent=String(letter.text||'');
      open.addEventListener('click',()=>{body.hidden=!body.hidden;open.textContent=body.hidden?'Abrir carta':'Cerrar carta';});
-     card.append(envelope,occasion,title,open,body);list.append(card);
+     const actions=document.createElement('div');actions.className='letter-share-actions';
+     const share=document.createElement('button');share.type='button';share.textContent='Compartir carta';
+     const copy=document.createElement('button');copy.type='button';copy.className='secondary';copy.textContent='Copiar carta';
+     const getLetterText=()=>String(letter.title||'Una carta para ti')+'\n'+String(letter.occasion||'Un momento especial')+'\n\n'+String(letter.text||'')+'\n\n— Under the same Moon ☾';
+     share.addEventListener('click',async()=>{
+       const payload={title:String(letter.title||'Una carta para ti'),text:getLetterText()};
+       try{
+         if(typeof navigator!=='undefined'&&typeof navigator.share==='function'){
+           await navigator.share(payload);
+           say('Tu carta está lista para compartir. 💙');
+         }else{
+           const copied=await copyText(getLetterText());
+           if(copied){say('Este navegador no ofrece el menú de compartir aquí; he copiado la carta para que puedas pegarla en Mensajes, WhatsApp o el correo. 💙');}
+           else{say('No se pudo abrir el menú de compartir. Prueba «Copiar carta».');}
+         }
+       }catch(err){
+         if(err&&err.name==='AbortError')say('No se ha enviado nada; puedes compartir la carta cuando quieras.');
+         else say('No se pudo abrir el menú de compartir. Prueba «Copiar carta».');
+       }
+     });
+     async function copyText(value){
+       try{
+         if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(value);return true;}
+       }catch(_){}
+       try{
+         const field=document.createElement('textarea');field.value=value;field.setAttribute('readonly','');field.style.position='fixed';field.style.opacity='0';document.body.append(field);field.select();const ok=document.execCommand('copy');field.remove();return ok;
+       }catch(_){return false;}
+     }
+     copy.addEventListener('click',async()=>{
+       if(await copyText(getLetterText()))say('Carta copiada. Ahora puedes pegarla donde quieras. ✨');
+       else say('No se pudo copiar automáticamente. Abre la carta y copia el texto manualmente.');
+     });
+     actions.append(share,copy);
+     card.append(envelope,occasion,title,open,body,actions);list.append(card);
    });
  }
  if(typeof auth!=='undefined'&&auth&&typeof db!=='undefined'&&db){
