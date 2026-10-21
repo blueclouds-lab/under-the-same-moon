@@ -123,6 +123,10 @@ label{display:block;font-size:17px;font-style:italic;color:#c8c5d0;margin:13px 0
 .thinking-controls{max-width:540px;margin:18px auto;display:grid;gap:12px;text-align:left}
 .thinking-controls select{width:100%;border:1px solid #48495a;border-radius:8px;background:#2c2e3d;padding:12px;color:var(--ink);font:inherit}
 .thinking-actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.thinking-custom-message{max-width:540px;margin:24px auto 10px;padding:18px;text-align:left;border:1px solid #756a83;border-radius:14px;background:linear-gradient(145deg,#292b3caa,#202230aa)}
+.thinking-custom-message label{display:block;margin-bottom:9px;color:#f0dca8;font-family:'Cormorant Garamond',serif;font-size:20px}
+.thinking-custom-message textarea{display:block;width:100%;box-sizing:border-box;min-height:90px;resize:vertical;background:#1d1f2c;color:var(--ink);border:1px solid #625a70;border-radius:10px;padding:12px;font:inherit;line-height:1.6;margin-bottom:10px}
+.thinking-custom-message .hint{margin-bottom:0}
 
 .special-letters-panel{text-align:center}
 .letters-form{max-width:620px;margin:18px auto;text-align:left;display:grid;gap:12px}
@@ -257,9 +261,15 @@ label{display:block;font-size:17px;font-style:italic;color:#c8c5d0;margin:13px 0
       </div>
     </div>
     <div class="thinking-actions">
-      <button type="button" id="thinkingNewMessage">Otro mensaje</button>
+      <button type="button" id="thinkingNewMessage">Otra estrella 💫</button>
       <button type="button" class="secondary" id="thinkingShareMessage">Compartir mensaje</button>
       <button type="button" class="secondary" id="thinkingCopyMessage">Copiar mensaje</button>
+    </div>
+    <div class="thinking-custom-message">
+      <label for="thinkingCustomText">O regálale tus propias palabras 💌</label>
+      <textarea id="thinkingCustomText" maxlength="500" rows="3" placeholder="Escribe aquí algo que solo tú quieras decirle…"></textarea>
+      <button type="button" id="thinkingUseCustomMessage">Iluminar mi mensaje con una perseida ✨</button>
+      <p class="hint">Tu mensaje aparecerá bajo la Luna y podrás compartirlo o copiarlo igual que los demás.</p>
     </div>
     <p class="status" id="thinkingMessageStatus" role="status" aria-live="polite"></p>
     <div class="countdown-actions"><button type="button" class="secondary" id="thinkingOfYouReturn">Volver al libro</button></div>
@@ -1332,6 +1342,15 @@ function friendlyError(err){
  back.addEventListener('click',showBook);
  mood.addEventListener('change',()=>{currentMessage='';chooseMessage();});
  document.getElementById('thinkingNewMessage').addEventListener('click',chooseMessage);
+ const customText=document.getElementById('thinkingCustomText');
+ document.getElementById('thinkingUseCustomMessage').addEventListener('click',()=>{
+   const value=(customText?.value||'').trim();
+   if(!value){say('Escribe primero unas palabras para regalarle tu estrella. 💙');customText?.focus();return;}
+   currentMessage=value;
+   message.textContent=currentMessage;
+   showPerseid();
+   say('Tu mensaje ya brilla bajo la Luna. Puedes compartirlo o copiarlo cuando quieras. 💙');
+ });
  document.getElementById('thinkingCopyMessage').addEventListener('click',async()=>{const value=currentMessage+'\n\n— Under the same Moon ☾';say(await copyText(value)?'Mensaje copiado. Ya puedes pegarlo donde quieras. 💙':'No se pudo copiar automáticamente; puedes seleccionar el texto y copiarlo.');});
  document.getElementById('thinkingShareMessage').addEventListener('click',async()=>{
    const payload={title:'Estoy pensando en ti ☾',text:currentMessage+'\n\n— Under the same Moon ☾'};
