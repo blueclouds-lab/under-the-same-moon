@@ -677,7 +677,7 @@ function albumRenderPhotos(){
 function albumRenderConstellation(){
   const panel=document.getElementById('albumConstellationPanel');
   const grid=document.getElementById('albumConstellationGrid');
-  if(!panel||!grid)return;
+  if(!panel||!grid||panel.classList.contains('hidden'))return;
   grid.replaceChildren();
   const chosenAlbum=albumChooseEl.value;
   const photos=Object.entries(albumPhotosCache).filter(([id,p])=>p&&p.albumId===chosenAlbum&&(!albumSelectedDateOnly||p.date===albumDateEl.value))
