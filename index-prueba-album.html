@@ -72,8 +72,31 @@ label{display:block;font-size:17px;font-style:italic;color:#c8c5d0;margin:13px 0
 #journalPanel.countdown-only-view #writeSectionButton,
 #journalPanel.countdown-only-view #sharePanel{display:none!important}
 #journalPanel.countdown-only-view #hugCountdownPanel{display:block!important}
+#journalPanel.letters-only-view #screenshotAlbumPanel,
+#journalPanel.letters-only-view .lunar-calendar,
+#journalPanel.letters-only-view #sectionHeading,
+#journalPanel.letters-only-view #journalSearchWrap,
+#journalPanel.letters-only-view #pageEditor,
+#journalPanel.letters-only-view #entriesHeading,
+#journalPanel.letters-only-view #entriesList,
+#journalPanel.letters-only-view #bookReader,
+#journalPanel.letters-only-view #writeSectionButton,
+#journalPanel.letters-only-view #sharePanel{display:none!important}
+#journalPanel.letters-only-view #specialLettersPanel{display:block!important}
 .book-tabs .countdown-tab:before{content:"♡";color:#aaaabd}
 .book-tabs .countdown-tab.active:before{color:#69542b}
+.book-tabs .letters-tab:before{content:"✉";color:#aaaabd}
+.book-tabs .letters-tab.active:before{color:#69542b}
+.special-letters-panel{text-align:center}
+.letters-form{max-width:620px;margin:18px auto;text-align:left;display:grid;gap:12px}
+.letters-form input,.letters-form select,.letters-form textarea{width:100%;background:#1d1f2c;color:var(--ink);border:1px solid #48495a;border-radius:10px;padding:12px;font:inherit}
+.letters-form textarea{min-height:130px;resize:vertical}
+.special-letter-card{border:1px solid #6a6177;border-radius:14px;padding:16px;margin:12px 0;text-align:left;background:linear-gradient(145deg,#292b3c,#202230);box-shadow:0 8px 22px #0002}
+.special-letter-card h3{font-family:"Parisienne",cursive;color:var(--gold);font-size:28px;font-weight:400;margin:4px 0}
+.special-letter-card .letter-envelope{font-size:28px;color:var(--gold)}
+.special-letter-body{white-space:pre-wrap;line-height:1.8;padding:14px 4px 2px;border-top:1px solid #48495a;margin-top:12px}
+.special-letter-empty{color:#c4b5d0;padding:16px}
+@media(prefers-reduced-motion:reduce){.special-letter-card *{scroll-behavior:auto!important}}
 
 </style>
 </head>
@@ -125,6 +148,7 @@ label{display:block;font-size:17px;font-style:italic;color:#c8c5d0;margin:13px 0
     <button type="button" class="tab-button" data-section="thoughts">Pensamientos</button>
     <button type="button" class="tab-button" data-section="memories">Recuerdos</button>
     <button type="button" class="tab-button countdown-tab" id="hugCountdownTab" aria-controls="hugCountdownPanel" aria-selected="false">Nuestro próximo abrazo</button>
+    <button type="button" class="tab-button letters-tab" id="specialLettersTab" aria-controls="specialLettersPanel" aria-selected="false">Cartas especiales</button>
   </nav>
 
   <section class="share-panel album-lunar" id="screenshotAlbumPanel" aria-labelledby="screenshotAlbumHeading">
@@ -190,6 +214,23 @@ label{display:block;font-size:17px;font-style:italic;color:#c8c5d0;margin:13px 0
     </div>
     <p class="countdown-status" id="hugCountdownStatus" role="status" aria-live="polite"></p>
     <div class="countdown-actions"><button type="button" class="secondary" id="hugCountdownReturn">Volver al libro</button></div>
+  </section>
+
+  <section class="share-panel lunar-calendar special-letters-panel" id="specialLettersPanel" aria-labelledby="specialLettersHeading" style="display:none">
+    <div aria-hidden="true" style="font-size:30px;color:#f0cb68;letter-spacing:.3em">✉ ✦ ☾</div>
+    <h2 id="specialLettersHeading">Cartas para abrir en el momento perfecto</h2>
+    <p class="hint">Pequeños sobres para esos días en que las palabras pueden convertirse en un abrazo. Escribe una carta, elige cuándo te gustaría abrirla y guárdala en tu rincón privado. 💙</p>
+    <form id="specialLetterForm" class="letters-form">
+      <div><label for="specialLetterOccasion">¿Cuándo abrir esta carta?</label><select id="specialLetterOccasion" required><option value="Cuando me eches de menos">Cuando me eches de menos</option><option value="Cuando tengas un día difícil">Cuando tengas un día difícil</option><option value="Cuando necesites un abrazo">Cuando necesites un abrazo</option><option value="Cuando quieras sonreír">Cuando quieras sonreír</option><option value="En una fecha especial">En una fecha especial</option><option value="Cuando llegue el día que nos veamos">Cuando llegue el día que nos veamos</option><option value="Otro momento especial">Otro momento especial</option></select></div>
+      <div><label for="specialLetterTitle">Título de la carta</label><input id="specialLetterTitle" maxlength="100" placeholder="Ej. Aunque hoy estemos lejos" required></div>
+      <div><label for="specialLetterText">Lo que quieres decir</label><textarea id="specialLetterText" maxlength="8000" placeholder="Escribe aquí tus palabras, sin prisa…" required></textarea></div>
+      <div><button id="specialLetterSave" type="submit">Guardar en un sobre ✉</button></div>
+      <p class="status" id="specialLetterStatus" role="status" aria-live="polite"></p>
+    </form>
+    <h3 style="font-family:'Parisienne',cursive;color:#f0cb68;font-size:30px;font-weight:400">Vuestros sobres</h3>
+    <p class="hint">Pulsa «Abrir carta» cuando quieras leer lo que guardaste.</p>
+    <div id="specialLettersList" aria-live="polite"><p class="special-letter-empty">Tus cartas aparecerán aquí cuando guardes la primera. ✨</p></div>
+    <div class="countdown-actions"><button type="button" class="secondary" id="specialLettersReturn">Volver al libro</button></div>
   </section>
 
   <section class="share-panel lunar-calendar" aria-labelledby="calendarHeading">
@@ -443,7 +484,7 @@ writeSectionButton.addEventListener('click', () => {
   document.getElementById('entryTitle').focus({preventScroll:true});
 });
 
-document.querySelectorAll('.book-tabs .tab-button:not(.countdown-tab)').forEach(button => button.addEventListener('click', () => {
+document.querySelectorAll('.book-tabs .tab-button:not(.countdown-tab):not(.letters-tab)').forEach(button => button.addEventListener('click', () => {
   currentSection = button.dataset.section;
   document.getElementById('journalSearch').value='';
   editingPageId = null;
@@ -963,8 +1004,9 @@ function friendlyError(err){
  const countdown=document.getElementById('hugCountdownPanel');
  const back=document.getElementById('hugCountdownReturn');
  if(!panel||!tab||!countdown||!back)return;
- const normalTabs=Array.from(panel.querySelectorAll('.book-tabs .tab-button:not(.countdown-tab)'));
+ const normalTabs=Array.from(panel.querySelectorAll('.book-tabs .tab-button:not(.countdown-tab):not(.letters-tab)'));
  function showCountdown(){
+   panel.classList.remove('letters-only-view');
    panel.classList.add('countdown-only-view');
    tab.classList.add('active');
    tab.setAttribute('aria-selected','true');
@@ -975,11 +1017,88 @@ function friendlyError(err){
    panel.classList.remove('countdown-only-view');
    tab.classList.remove('active');
    tab.setAttribute('aria-selected','false');
-   const active=panel.querySelector('.book-tabs .tab-button.active:not(.countdown-tab)');
+   const active=panel.querySelector('.book-tabs .tab-button.active:not(.countdown-tab):not(.letters-tab)');
    if(!active&&normalTabs[0]){normalTabs[0].classList.add('active');normalTabs[0].setAttribute('aria-selected','true');}
    panel.querySelector('.book-tabs').scrollIntoView({behavior:'smooth',block:'start'});
  }
  tab.addEventListener('click',showCountdown);
+ back.addEventListener('click',showBook);
+ normalTabs.forEach(t=>t.addEventListener('click',showBook));
+})();
+</script>
+
+<script>
+/* Cartas especiales: guardadas en la zona privada del usuario, sin tocar las páginas existentes. */
+(function(){
+ const panel=document.getElementById('journalPanel');
+ const tab=document.getElementById('specialLettersTab');
+ const lettersPanel=document.getElementById('specialLettersPanel');
+ const back=document.getElementById('specialLettersReturn');
+ const form=document.getElementById('specialLetterForm');
+ const list=document.getElementById('specialLettersList');
+ const status=document.getElementById('specialLetterStatus');
+ const saveButton=document.getElementById('specialLetterSave');
+ if(!panel||!tab||!lettersPanel||!back||!form||!list)return;
+ const normalTabs=Array.from(panel.querySelectorAll('.book-tabs .tab-button:not(.countdown-tab):not(.letters-tab)'));
+ let lettersRef=null, lettersCache={};
+ function say(message){if(status)status.textContent=message;}
+ function showLetters(){
+   panel.classList.remove('countdown-only-view');
+   panel.classList.add('letters-only-view');
+   tab.classList.add('active');
+   tab.setAttribute('aria-selected','true');
+   document.getElementById('hugCountdownTab')?.classList.remove('active');
+   document.getElementById('hugCountdownTab')?.setAttribute('aria-selected','false');
+   normalTabs.forEach(t=>{t.classList.remove('active');t.setAttribute('aria-selected','false');});
+   lettersPanel.scrollIntoView({behavior:'smooth',block:'start'});
+ }
+ function showBook(){
+   panel.classList.remove('letters-only-view');
+   tab.classList.remove('active');
+   tab.setAttribute('aria-selected','false');
+   const active=panel.querySelector('.book-tabs .tab-button.active:not(.countdown-tab):not(.letters-tab)');
+   if(!active&&normalTabs[0]){normalTabs[0].classList.add('active');normalTabs[0].setAttribute('aria-selected','true');}
+   panel.querySelector('.book-tabs').scrollIntoView({behavior:'smooth',block:'start'});
+ }
+ function renderLetters(){
+   list.replaceChildren();
+   const items=Object.entries(lettersCache).sort((a,b)=>(Number(b[1]?.createdAt)||0)-(Number(a[1]?.createdAt)||0));
+   if(!items.length){const empty=document.createElement('p');empty.className='special-letter-empty';empty.textContent='Todavía no hay sobres guardados. Tu primera carta puede empezar cuando quieras. ✨';list.append(empty);return;}
+   items.forEach(([id,letter])=>{
+     const card=document.createElement('article');card.className='special-letter-card';
+     const envelope=document.createElement('div');envelope.className='letter-envelope';envelope.textContent='✉';
+     const occasion=document.createElement('p');occasion.className='hint';occasion.textContent='Para abrir: '+String(letter.occasion||'Un momento especial');
+     const title=document.createElement('h3');title.textContent=String(letter.title||'Una carta para ti');
+     const open=document.createElement('button');open.type='button';open.textContent='Abrir carta';
+     const body=document.createElement('div');body.className='special-letter-body';body.hidden=true;body.textContent=String(letter.text||'');
+     open.addEventListener('click',()=>{body.hidden=!body.hidden;open.textContent=body.hidden?'Abrir carta':'Cerrar carta';});
+     card.append(envelope,occasion,title,open,body);list.append(card);
+   });
+ }
+ if(typeof auth!=='undefined'&&auth&&typeof db!=='undefined'&&db){
+   auth.onAuthStateChanged(user=>{
+     if(lettersRef){lettersRef.off();lettersRef=null;}
+     lettersCache={};renderLetters();
+     if(!user)return;
+     lettersRef=db.ref('users/'+user.uid+'/specialLetters');
+     lettersRef.on('value',snap=>{lettersCache=snap.val()||{};renderLetters();},err=>say('No se pudieron cargar las cartas: '+(err.message||'inténtalo de nuevo.')));
+   });
+ }
+ form.addEventListener('submit',async event=>{
+   event.preventDefault();
+   if(typeof currentUser==='undefined'||!currentUser||typeof db==='undefined'||!db){say('Inicia sesión para guardar tus cartas en tu espacio privado.');return;}
+   const occasion=document.getElementById('specialLetterOccasion').value;
+   const title=document.getElementById('specialLetterTitle').value.trim();
+   const textValue=document.getElementById('specialLetterText').value.trim();
+   if(!title||!textValue){say('Añade un título y unas palabras antes de guardar.');return;}
+   saveButton.disabled=true;say('Guardando tu carta en un sobre…');
+   try{
+     await db.ref('users/'+currentUser.uid+'/specialLetters').push({occasion,title,text:textValue,createdAt:Date.now()});
+     form.reset();say('Tu carta está guardada en tu rincón privado. ☾');
+   }catch(err){say('No se pudo guardar la carta: '+(err.message||'inténtalo de nuevo.'));}
+   finally{saveButton.disabled=false;}
+ });
+ tab.addEventListener('click',showLetters);
  back.addEventListener('click',showBook);
  normalTabs.forEach(t=>t.addEventListener('click',showBook));
 })();
