@@ -104,6 +104,17 @@ label{display:block;font-size:17px;font-style:italic;color:#c8c5d0;margin:13px 0
 .thinking-message{max-width:580px;margin:22px auto;padding:28px 22px;border:1px solid #756a83;border-radius:16px;background:radial-gradient(ellipse at 50% 0,#39344b,#222431 72%);box-shadow:0 12px 30px #0003}
 .thinking-message blockquote{font-size:clamp(22px,5vw,29px);font-style:italic;line-height:1.65;color:#e9dfc5;margin:10px 0 20px}
 .thinking-message .moon{font-size:34px}
+.thinking-message{position:relative;isolation:isolate;overflow:hidden}
+.thinking-sky{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+.thinking-sky:before,.thinking-sky:after{content:"✦";position:absolute;top:12%;left:-12%;color:#fff0b8;font-size:17px;opacity:0;text-shadow:0 0 8px #ffe6a0,0 0 20px #f0cb68;transform:rotate(-25deg)}
+.thinking-message.meteor-active .thinking-sky:before{animation:perseidsCross 1.25s cubic-bezier(.2,.65,.25,1) both}
+.thinking-message.meteor-active .thinking-sky:after{animation:perseidsCross 1.25s .16s cubic-bezier(.2,.65,.25,1) both;font-size:10px;top:26%;color:#e6e9ff}
+.thinking-message>*:not(.thinking-sky){position:relative;z-index:1}
+#thinkingMessageText{transition:color .45s,text-shadow .45s}
+.thinking-message.meteor-glow #thinkingMessageText{color:#fff0c1;text-shadow:0 0 9px #f0cb6877,0 0 22px #f0cb683d}
+@keyframes perseidsCross{0%{left:-12%;top:12%;opacity:0;transform:translate(0,0) rotate(-25deg) scale(.7)}12%{opacity:1}68%{opacity:1}100%{left:112%;top:78%;opacity:0;transform:translate(0,0) rotate(-25deg) scale(1.15)}}
+@media(prefers-reduced-motion:reduce){.thinking-message.meteor-active .thinking-sky:before,.thinking-message.meteor-active .thinking-sky:after{animation:none;display:none}.thinking-message.meteor-glow #thinkingMessageText{transition:none}}
+
 .thinking-controls{max-width:540px;margin:18px auto;display:grid;gap:12px;text-align:left}
 .thinking-controls select{width:100%;border:1px solid #48495a;border-radius:8px;background:#2c2e3d;padding:12px;color:var(--ink);font:inherit}
 .thinking-actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
@@ -229,7 +240,8 @@ label{display:block;font-size:17px;font-style:italic;color:#c8c5d0;margin:13px 0
         <option value="moon">La Luna me ha hecho pensar en ti</option>
       </select></div>
     </div>
-    <div class="thinking-message">
+    <div class="thinking-message" id="thinkingMessageCard">
+      <div class="thinking-sky" aria-hidden="true"></div>
       <div class="moon" aria-hidden="true">☾</div>
       <p id="thinkingMessageText" role="status" aria-live="polite">Aunque hoy nos separen kilómetros, hay una parte de mí que siempre encuentra el camino hasta ti. Te echo de menos. 💙</p>
       <p style="color:#c8c5d0;font-style:italic">— Under the same Moon ✨</p>
@@ -1199,6 +1211,7 @@ function friendlyError(err){
  const back=document.getElementById('thinkingOfYouReturn');
  const mood=document.getElementById('thinkingMood');
  const message=document.getElementById('thinkingMessageText');
+ const messageCard=document.getElementById('thinkingMessageCard');
  const status=document.getElementById('thinkingMessageStatus');
  if(!panel||!tab||!view||!back||!mood||!message)return;
  const normalTabs=Array.from(panel.querySelectorAll('.book-tabs .tab-button:not(.countdown-tab):not(.letters-tab):not(.thinking-tab)'));
@@ -1231,12 +1244,21 @@ function friendlyError(err){
  };
  let currentMessage=messages[mood.value][0];
  function say(t){if(status)status.textContent=t;}
+ function showPerseid(){
+   if(!messageCard)return;
+   messageCard.classList.remove('meteor-active','meteor-glow');
+   void messageCard.offsetWidth;
+   messageCard.classList.add('meteor-active');
+   window.setTimeout(()=>messageCard.classList.add('meteor-glow'),760);
+   window.setTimeout(()=>messageCard.classList.remove('meteor-active'),1500);
+ }
  function chooseMessage(){
    const list=messages[mood.value]||messages.miss;
    const choices=list.filter(x=>x!==currentMessage);
    currentMessage=(choices.length?choices:list)[Math.floor(Math.random()*(choices.length?choices:list).length)];
    message.textContent=currentMessage;
-   say('Un mensaje nuevo, listo para compartir si te apetece. 💙');
+   showPerseid();
+   say('Una perseida ha dejado este mensaje iluminado. Listo para compartir si te apetece. 💙');
  }
  function showView(){
    panel.classList.remove('countdown-only-view','letters-only-view');
@@ -1248,6 +1270,7 @@ function friendlyError(err){
    document.getElementById('specialLettersTab')?.setAttribute('aria-selected','false');
    normalTabs.forEach(t=>{t.classList.remove('active');t.setAttribute('aria-selected','false');});
    view.scrollIntoView({behavior:'smooth',block:'start'});
+   showPerseid();
  }
  function showBook(){
    panel.classList.remove('thinking-only-view');
