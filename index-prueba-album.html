@@ -87,6 +87,27 @@ label{display:block;font-size:17px;font-style:italic;color:#c8c5d0;margin:13px 0
 .book-tabs .countdown-tab.active:before{color:#69542b}
 .book-tabs .letters-tab:before{content:"✉";color:#aaaabd}
 .book-tabs .letters-tab.active:before{color:#69542b}
+.book-tabs .thinking-tab:before{content:"♡";color:#aaaabd}
+.book-tabs .thinking-tab.active:before{color:#69542b}
+#journalPanel.thinking-only-view #screenshotAlbumPanel,
+#journalPanel.thinking-only-view .lunar-calendar,
+#journalPanel.thinking-only-view #sectionHeading,
+#journalPanel.thinking-only-view #journalSearchWrap,
+#journalPanel.thinking-only-view #pageEditor,
+#journalPanel.thinking-only-view #entriesHeading,
+#journalPanel.thinking-only-view #entriesList,
+#journalPanel.thinking-only-view #bookReader,
+#journalPanel.thinking-only-view #writeSectionButton,
+#journalPanel.thinking-only-view #sharePanel{display:none!important}
+#journalPanel.thinking-only-view #thinkingOfYouPanel{display:block!important}
+.thinking-panel{text-align:center}
+.thinking-message{max-width:580px;margin:22px auto;padding:28px 22px;border:1px solid #756a83;border-radius:16px;background:radial-gradient(ellipse at 50% 0,#39344b,#222431 72%);box-shadow:0 12px 30px #0003}
+.thinking-message blockquote{font-size:clamp(22px,5vw,29px);font-style:italic;line-height:1.65;color:#e9dfc5;margin:10px 0 20px}
+.thinking-message .moon{font-size:34px}
+.thinking-controls{max-width:540px;margin:18px auto;display:grid;gap:12px;text-align:left}
+.thinking-controls select{width:100%;border:1px solid #48495a;border-radius:8px;background:#2c2e3d;padding:12px;color:var(--ink);font:inherit}
+.thinking-actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+
 .special-letters-panel{text-align:center}
 .letters-form{max-width:620px;margin:18px auto;text-align:left;display:grid;gap:12px}
 .letters-form input,.letters-form select,.letters-form textarea{width:100%;background:#1d1f2c;color:var(--ink);border:1px solid #48495a;border-radius:10px;padding:12px;font:inherit}
@@ -151,6 +172,7 @@ label{display:block;font-size:17px;font-style:italic;color:#c8c5d0;margin:13px 0
     <button type="button" class="tab-button" data-section="memories">Recuerdos</button>
     <button type="button" class="tab-button countdown-tab" id="hugCountdownTab" aria-controls="hugCountdownPanel" aria-selected="false">Nuestro próximo abrazo</button>
     <button type="button" class="tab-button letters-tab" id="specialLettersTab" aria-controls="specialLettersPanel" aria-selected="false">Cartas especiales</button>
+    <button type="button" class="tab-button thinking-tab" id="thinkingOfYouTab" aria-controls="thinkingOfYouPanel" aria-selected="false">Estoy pensando en ti</button>
   </nav>
 
   <section class="share-panel album-lunar" id="screenshotAlbumPanel" aria-labelledby="screenshotAlbumHeading">
@@ -192,6 +214,34 @@ label{display:block;font-size:17px;font-style:italic;color:#c8c5d0;margin:13px 0
     </section>
   </section>
 
+
+  <section class="share-panel lunar-calendar thinking-panel" id="thinkingOfYouPanel" aria-labelledby="thinkingOfYouHeading" style="display:none">
+    <div aria-hidden="true" style="font-size:30px;color:#f0cb68;letter-spacing:.3em">☾ ✦ ♡</div>
+    <h2 id="thinkingOfYouHeading">Estoy pensando en ti</h2>
+    <p class="hint">A veces, unas pocas palabras bastan para acortar la distancia. Elige un sentimiento y prepara un pequeño mensaje para compartir. 💙</p>
+    <div class="thinking-controls">
+      <div><label for="thinkingMood">¿Qué quieres transmitir?</label>
+      <select id="thinkingMood">
+        <option value="miss">Te echo de menos</option>
+        <option value="hug">Quiero darte un abrazo</option>
+        <option value="smile">Quiero hacerte sonreír</option>
+        <option value="love">Quiero recordarte cuánto te quiero</option>
+        <option value="moon">La Luna me ha hecho pensar en ti</option>
+      </select></div>
+    </div>
+    <div class="thinking-message">
+      <div class="moon" aria-hidden="true">☾</div>
+      <p id="thinkingMessageText" role="status" aria-live="polite">Aunque hoy nos separen kilómetros, hay una parte de mí que siempre encuentra el camino hasta ti. Te echo de menos. 💙</p>
+      <p style="color:#c8c5d0;font-style:italic">— Under the same Moon ✨</p>
+    </div>
+    <div class="thinking-actions">
+      <button type="button" id="thinkingNewMessage">Otro mensaje</button>
+      <button type="button" class="secondary" id="thinkingShareMessage">Compartir mensaje</button>
+      <button type="button" class="secondary" id="thinkingCopyMessage">Copiar mensaje</button>
+    </div>
+    <p class="status" id="thinkingMessageStatus" role="status" aria-live="polite"></p>
+    <div class="countdown-actions"><button type="button" class="secondary" id="thinkingOfYouReturn">Volver al libro</button></div>
+  </section>
 
   <section class="share-panel lunar-calendar countdown-panel" id="hugCountdownPanel" aria-labelledby="hugCountdownHeading">
     <div aria-hidden="true" style="font-size:30px;color:#f0cb68;letter-spacing:.35em">☾ ✦ ☽</div>
@@ -1136,6 +1186,90 @@ function friendlyError(err){
  tab.addEventListener('click',showLetters);
  back.addEventListener('click',showBook);
  normalTabs.forEach(t=>t.addEventListener('click',showBook));
+})();
+</script>
+
+
+<script>
+/* Mensajes «Estoy pensando en ti»: se generan en esta página y solo se comparten si la persona pulsa el botón. */
+(function(){
+ const panel=document.getElementById('journalPanel');
+ const tab=document.getElementById('thinkingOfYouTab');
+ const view=document.getElementById('thinkingOfYouPanel');
+ const back=document.getElementById('thinkingOfYouReturn');
+ const mood=document.getElementById('thinkingMood');
+ const message=document.getElementById('thinkingMessageText');
+ const status=document.getElementById('thinkingMessageStatus');
+ if(!panel||!tab||!view||!back||!mood||!message)return;
+ const normalTabs=Array.from(panel.querySelectorAll('.book-tabs .tab-button:not(.countdown-tab):not(.letters-tab):not(.thinking-tab)'));
+ const messages={
+  miss:[
+   'Aunque hoy nos separen kilómetros, hay una parte de mí que siempre encuentra el camino hasta ti. Te echo de menos. 💙',
+   'Ojalá pudiera convertir este mensaje en un abrazo largo. Hasta que llegue ese momento, te mando todo mi cariño. ☾',
+   'Hay días en los que la distancia pesa un poquito más. Hoy quería recordarte que estás muy cerquita de mi corazón. ✨'
+  ],
+  hug:[
+   'Si pudiera pedirle algo a la Luna, sería que te acercara un instante para abrazarte sin mirar el reloj. 🌙',
+   'Te debo un abrazo de esos que dicen todo lo que las palabras no saben explicar. Guárdame uno para cuando nos veamos. 💙',
+   'Cierra los ojos un segundo: imagina mis brazos rodeándote. Ese abrazo está pendiente, pero ya es nuestro. ✨'
+  ],
+  smile:[
+   'Pequeño recordatorio del día: hay alguien al otro lado que sonríe al pensar en ti. Adivina quién. ♡',
+   'Te envío un beso invisible, una sonrisa enorme y una razón más para que hoy sea un poquito mejor. ☀️',
+   'Si este mensaje consigue sacarte una sonrisa, ya habrá cumplido su misión. Y si no, te mando otro abrazo. 💫'
+  ],
+  love:[
+   'No necesito tenerte al lado para elegirte en mis pensamientos, en mis planes y en cada pequeño mañana que imagino. Te quiero. 💙',
+   'Por si hoy se te olvida: eres una de mis partes favoritas de la vida. Qué suerte la mía de coincidir contigo. ✨',
+   'La distancia cuenta kilómetros; yo cuento las ganas de verte, las cosas que quiero contarte y todos los abrazos pendientes. Te quiero. ☾'
+  ],
+  moon:[
+   'He mirado la Luna y he pensado que, aunque no estemos bajo el mismo techo, seguimos compartiendo el mismo cielo. Y tú, mis pensamientos. ☾',
+   'Esta noche la Luna tiene una tarea: recordarte que alguien, desde su rincón del mundo, está pensando en ti. 💙',
+   'Mira la Luna cuando puedas. Quizá estemos mirándola a la vez, y por un instante la distancia sea un poquito menos grande. ✨'
+  ]
+ };
+ let currentMessage=messages[mood.value][0];
+ function say(t){if(status)status.textContent=t;}
+ function chooseMessage(){
+   const list=messages[mood.value]||messages.miss;
+   const choices=list.filter(x=>x!==currentMessage);
+   currentMessage=(choices.length?choices:list)[Math.floor(Math.random()*(choices.length?choices:list).length)];
+   message.textContent=currentMessage;
+   say('Un mensaje nuevo, listo para compartir si te apetece. 💙');
+ }
+ function showView(){
+   panel.classList.remove('countdown-only-view','letters-only-view');
+   panel.classList.add('thinking-only-view');
+   tab.classList.add('active');tab.setAttribute('aria-selected','true');
+   document.getElementById('hugCountdownTab')?.classList.remove('active');
+   document.getElementById('hugCountdownTab')?.setAttribute('aria-selected','false');
+   document.getElementById('specialLettersTab')?.classList.remove('active');
+   document.getElementById('specialLettersTab')?.setAttribute('aria-selected','false');
+   normalTabs.forEach(t=>{t.classList.remove('active');t.setAttribute('aria-selected','false');});
+   view.scrollIntoView({behavior:'smooth',block:'start'});
+ }
+ function showBook(){
+   panel.classList.remove('thinking-only-view');
+   tab.classList.remove('active');tab.setAttribute('aria-selected','false');
+   const active=panel.querySelector('.book-tabs .tab-button.active:not(.countdown-tab):not(.letters-tab):not(.thinking-tab)');
+   if(!active&&normalTabs[0]){normalTabs[0].classList.add('active');normalTabs[0].setAttribute('aria-selected','true');}
+   panel.querySelector('.book-tabs').scrollIntoView({behavior:'smooth',block:'start'});
+ }
+ async function copyText(value){
+   try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(value);return true;}}catch(_){}
+   try{const field=document.createElement('textarea');field.value=value;field.setAttribute('readonly','');field.style.position='fixed';field.style.opacity='0';document.body.append(field);field.select();const ok=document.execCommand('copy');field.remove();return ok;}catch(_){return false;}
+ }
+ tab.addEventListener('click',showView);
+ back.addEventListener('click',showBook);
+ mood.addEventListener('change',()=>{currentMessage='';chooseMessage();});
+ document.getElementById('thinkingNewMessage').addEventListener('click',chooseMessage);
+ document.getElementById('thinkingCopyMessage').addEventListener('click',async()=>{const value=currentMessage+'\n\n— Under the same Moon ☾';say(await copyText(value)?'Mensaje copiado. Ya puedes pegarlo donde quieras. 💙':'No se pudo copiar automáticamente; puedes seleccionar el texto y copiarlo.');});
+ document.getElementById('thinkingShareMessage').addEventListener('click',async()=>{
+   const payload={title:'Estoy pensando en ti ☾',text:currentMessage+'\n\n— Under the same Moon ☾'};
+   try{if(typeof navigator.share==='function'){await navigator.share(payload);say('Tu mensaje está listo para compartir. 💙');}else{say(await copyText(payload.text)?'Este navegador no ofrece compartir aquí; he copiado el mensaje para que puedas pegarlo en WhatsApp, Mensajes o correo.':'No se pudo compartir ni copiar automáticamente.');}}
+   catch(err){say(err&&err.name==='AbortError'?'No se ha enviado nada; puedes compartirlo cuando quieras.':'No se pudo abrir el menú de compartir. Prueba «Copiar mensaje».');}
+ });
 })();
 </script>
 
