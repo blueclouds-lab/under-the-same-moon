@@ -60,6 +60,21 @@ label{display:block;font-size:17px;font-style:italic;color:#c8c5d0;margin:13px 0
 @media(max-width:420px){.countdown-panel{padding:18px 10px}.countdown-units{gap:5px}.countdown-unit{padding:10px 2px}.countdown-label{font-size:9px}}
 @media(prefers-reduced-motion:reduce){.countdown-panel *{scroll-behavior:auto!important}}
 
+
+#journalPanel.countdown-only-view #screenshotAlbumPanel,
+#journalPanel.countdown-only-view .lunar-calendar,
+#journalPanel.countdown-only-view #sectionHeading,
+#journalPanel.countdown-only-view #journalSearchWrap,
+#journalPanel.countdown-only-view #pageEditor,
+#journalPanel.countdown-only-view #entriesHeading,
+#journalPanel.countdown-only-view #entriesList,
+#journalPanel.countdown-only-view #bookReader,
+#journalPanel.countdown-only-view #writeSectionButton,
+#journalPanel.countdown-only-view #sharePanel{display:none!important}
+#journalPanel.countdown-only-view #hugCountdownPanel{display:block!important}
+.book-tabs .countdown-tab:before{content:"♡";color:#aaaabd}
+.book-tabs .countdown-tab.active:before{color:#69542b}
+
 </style>
 </head>
 <body>
@@ -109,6 +124,7 @@ label{display:block;font-size:17px;font-style:italic;color:#c8c5d0;margin:13px 0
     <button type="button" class="tab-button active" data-section="poems">Poemas</button>
     <button type="button" class="tab-button" data-section="thoughts">Pensamientos</button>
     <button type="button" class="tab-button" data-section="memories">Recuerdos</button>
+    <button type="button" class="tab-button countdown-tab" id="hugCountdownTab" aria-controls="hugCountdownPanel" aria-selected="false">Nuestro próximo abrazo</button>
   </nav>
 
   <section class="share-panel album-lunar" id="screenshotAlbumPanel" aria-labelledby="screenshotAlbumHeading">
@@ -173,6 +189,7 @@ label{display:block;font-size:17px;font-style:italic;color:#c8c5d0;margin:13px 0
       <button type="button" class="secondary" id="hugCountdownClear">Dejar sin fecha</button>
     </div>
     <p class="countdown-status" id="hugCountdownStatus" role="status" aria-live="polite"></p>
+    <div class="countdown-actions"><button type="button" class="secondary" id="hugCountdownReturn">Volver al libro</button></div>
   </section>
 
   <section class="share-panel lunar-calendar" aria-labelledby="calendarHeading">
@@ -934,6 +951,37 @@ function friendlyError(err){
   if(target) status.textContent = 'Tu fecha está guardada. Puedes cambiarla cuando quieras.';
   update();
   window.setInterval(update,1000);
+})();
+</script>
+
+
+<script>
+/* Navegación independiente para la cuenta atrás, sin tocar el diario guardado. */
+(function(){
+ const panel=document.getElementById('journalPanel');
+ const tab=document.getElementById('hugCountdownTab');
+ const countdown=document.getElementById('hugCountdownPanel');
+ const back=document.getElementById('hugCountdownReturn');
+ if(!panel||!tab||!countdown||!back)return;
+ const normalTabs=Array.from(panel.querySelectorAll('.book-tabs .tab-button:not(.countdown-tab)'));
+ function showCountdown(){
+   panel.classList.add('countdown-only-view');
+   tab.classList.add('active');
+   tab.setAttribute('aria-selected','true');
+   normalTabs.forEach(t=>{t.classList.remove('active');t.setAttribute('aria-selected','false');});
+   countdown.scrollIntoView({behavior:'smooth',block:'start'});
+ }
+ function showBook(){
+   panel.classList.remove('countdown-only-view');
+   tab.classList.remove('active');
+   tab.setAttribute('aria-selected','false');
+   const active=panel.querySelector('.book-tabs .tab-button.active:not(.countdown-tab)');
+   if(!active&&normalTabs[0]){normalTabs[0].classList.add('active');normalTabs[0].setAttribute('aria-selected','true');}
+   panel.querySelector('.book-tabs').scrollIntoView({behavior:'smooth',block:'start'});
+ }
+ tab.addEventListener('click',showCountdown);
+ back.addEventListener('click',showBook);
+ normalTabs.forEach(t=>t.addEventListener('click',showBook));
 })();
 </script>
 
