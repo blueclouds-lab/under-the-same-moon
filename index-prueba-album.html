@@ -39,7 +39,7 @@ label{display:block;font-size:17px;font-style:italic;color:#c8c5d0;margin:13px 0
 .album-photo-card{min-width:0;border:1px solid #48495a;border-radius:9px;padding:8px;background:linear-gradient(145deg,#2c2e3d,#222431);box-shadow:0 5px 14px #0002;transition:transform .2s,border-color .2s}.album-photo-card:hover{transform:translateY(-2px);border-color:#a99c78}.album-photo-card img{cursor:zoom-in;transition:opacity .2s}.album-photo-card img:hover{opacity:.9}
 .album-photo-card img{display:block;width:100%;aspect-ratio:1;object-fit:contain;background:#171923;border-radius:6px}
 .album-photo-card p{font-size:15px;margin:7px 0 3px;overflow-wrap:anywhere}
-.album-photo-card button{width:100%;margin-top:6px;padding:7px}
+.album-photo-card button{width:100%;margin-top:6px;padding:7px}.constellation-panel{position:relative;isolation:isolate;margin-top:18px;padding:20px 14px 24px;border:1px solid #4c4b61;border-radius:14px;background:radial-gradient(ellipse at 50% 45%,#343047 0,#202130 65%,#171923 100%);overflow:hidden}.constellation-panel:before{content:"";position:absolute;inset:0;background-image:radial-gradient(#e8d8a955 .7px,transparent .9px),radial-gradient(#e8d8a922 .7px,transparent .9px);background-size:37px 41px,53px 59px;background-position:0 0,19px 13px;pointer-events:none;z-index:-1}.constellation-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:12px;align-items:center}.constellation-star{position:relative;min-width:0;min-height:108px;border:1px solid #7d719955;border-radius:10px;background:#17192366;color:#f0cb68;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding:10px 5px;font:inherit;cursor:pointer}.constellation-star:before{content:"";position:absolute;width:1px;height:36px;background:linear-gradient(#e5d39b88,transparent);top:-23px;left:50%;transform:rotate(38deg);z-index:-1}.constellation-star:hover,.constellation-star:focus-visible{border-color:#f0cb68;background:#39344b;outline:2px solid #f0cb6844}.constellation-star .star-glyph{font-size:27px;line-height:1;text-shadow:0 0 8px #f0cb68aa;animation:starTwinkle 4.8s ease-in-out infinite}.constellation-star .star-date{font-size:12px;color:#dedbe5}.constellation-star .star-name{font-size:13px;color:#f0cb68;max-width:100%;overflow-wrap:anywhere;text-align:center}.constellation-star .star-thumb{width:46px;height:46px;object-fit:cover;border-radius:50%;border:1px solid #d8c88c88}.constellation-toggle[aria-expanded="true"]{border-color:#d8c88c}
 .album-note{font-size:15px;color:#aaaabd;line-height:1.45}
 @media(min-width:600px){.album-controls.two{grid-template-columns:1fr 1fr}}
 
@@ -125,6 +125,12 @@ label{display:block;font-size:17px;font-style:italic;color:#c8c5d0;margin:13px 0
     </div>
     <p class="status" id="albumStatus" role="status" aria-live="polite"></p>
     <div id="albumPhotoGrid" class="album-photo-grid"><p class="hint">Tus capturas guardadas aparecerán aquí.</p></div>
+    <div class="album-toolbar"><button type="button" class="secondary constellation-toggle" id="albumConstellationToggle" aria-expanded="false">✦ Ver constelación de recuerdos</button></div>
+    <section class="constellation-panel hidden" id="albumConstellationPanel" aria-label="Constelación de recuerdos">
+      <h3 style="font-family:'Parisienne',cursive;color:#f0cb68;font-size:32px;font-weight:400;text-align:center;margin:0 0 5px">Tus recuerdos, como estrellas</h3>
+      <p class="hint" style="text-align:center">Toca una estrella para abrir la captura que guarda.</p>
+      <div id="albumConstellationGrid" class="constellation-grid"></div>
+    </section>
   </section>
 
   <section class="share-panel lunar-calendar" aria-labelledby="calendarHeading">
@@ -634,8 +640,8 @@ function albumRenderPhotos(){
   const chosenAlbum=albumChooseEl.value;
   const photos=Object.entries(albumPhotosCache).filter(([id,p])=>p && p.albumId===chosenAlbum && (!albumSelectedDateOnly || p.date===albumDateEl.value))
     .sort((a,b)=>albumSafeText(b[1].date).localeCompare(albumSafeText(a[1].date)) || albumSafeText(a[1].name).localeCompare(albumSafeText(b[1].name),'es'));
-  if(!chosenAlbum){grid.textContent='Crea un álbum para empezar a guardar capturas.';return;}
-  if(!photos.length){const p=document.createElement('p');p.className='hint';p.textContent=albumSelectedDateOnly?'No hay capturas de este álbum en esa fecha.':'Este álbum aún no tiene capturas guardadas.';grid.appendChild(p);return;}
+  if(!chosenAlbum){grid.textContent='Crea un álbum para empezar a guardar capturas.';albumRenderConstellation();return;}
+  if(!photos.length){const p=document.createElement('p');p.className='hint';p.textContent=albumSelectedDateOnly?'No hay capturas de este álbum en esa fecha.':'Este álbum aún no tiene capturas guardadas.';grid.appendChild(p);albumRenderConstellation();return;}
   photos.forEach(([id,meta])=>{
     const card=document.createElement('article');card.className='album-photo-card';
     const img=document.createElement('img');img.alt=albumSafeText(meta.name||'Captura guardada');img.loading='lazy';img.src='data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
@@ -666,7 +672,43 @@ function albumRenderPhotos(){
       }).catch(()=>{});
     }
   });
+  albumRenderConstellation();
 }
+function albumRenderConstellation(){
+  const panel=document.getElementById('albumConstellationPanel');
+  const grid=document.getElementById('albumConstellationGrid');
+  if(!panel||!grid)return;
+  grid.replaceChildren();
+  const chosenAlbum=albumChooseEl.value;
+  const photos=Object.entries(albumPhotosCache).filter(([id,p])=>p&&p.albumId===chosenAlbum&&(!albumSelectedDateOnly||p.date===albumDateEl.value))
+    .sort((a,b)=>albumSafeText(b[1].date).localeCompare(albumSafeText(a[1].date))||albumSafeText(a[1].name).localeCompare(albumSafeText(b[1].name),'es'));
+  if(!chosenAlbum||!photos.length){const p=document.createElement('p');p.className='hint';p.textContent='Cuando este álbum tenga capturas, aparecerán aquí como pequeñas estrellas.';grid.appendChild(p);return;}
+  photos.forEach(([id,meta],index)=>{
+    const star=document.createElement('button');star.type='button';star.className='constellation-star';star.setAttribute('aria-label','Abrir recuerdo: '+albumSafeText(meta.name||'Captura')+', '+albumSafeText(meta.date));
+    const glyph=document.createElement('span');glyph.className='star-glyph';glyph.textContent=['✦','✧','✶','✦','✧'][index%5];
+    const date=document.createElement('span');date.className='star-date';date.textContent=albumSafeText(meta.date||'Sin fecha');
+    const name=document.createElement('span');name.className='star-name';name.textContent=albumSafeText(meta.name||'Recuerdo lunar');
+    star.append(glyph,date,name);
+    if(albumThumbRef)albumThumbRef.child(id).once('value').then(snap=>{if(!snap.val()||!snap.val().dataUrl||!star.isConnected)return;const img=document.createElement('img');img.className='star-thumb';img.src=snap.val().dataUrl;img.alt='';star.insertBefore(img,glyph);glyph.remove();}).catch(()=>{});
+    star.addEventListener('click',async()=>{
+      if(!albumImageRef){albumStatus('Inicia sesión para abrir las capturas.');return;}
+      star.disabled=true;albumStatus('Abriendo recuerdo…');
+      try{const snap=await albumImageRef.child(id).once('value');const value=snap.val();if(!value||!value.dataUrl)throw new Error('No se encontró el archivo de esta captura.');const w=window.open();if(w){w.document.title=meta.name||'Recuerdo lunar';w.document.body.style='margin:0;background:#171923;display:grid;place-items:center;min-height:100vh';const img=w.document.createElement('img');img.src=value.dataUrl;img.alt=meta.name||'Captura';img.style='max-width:100%;height:auto;max-height:100vh;object-fit:contain';w.document.body.appendChild(img);}else albumStatus('El navegador ha bloqueado la ventana. Usa «Abrir captura» en la galería.');}
+      catch(err){albumStatus('No se pudo abrir el recuerdo: '+friendlyError(err));}
+      finally{star.disabled=false;}
+    });
+    grid.appendChild(star);
+  });
+}
+document.getElementById('albumConstellationToggle').addEventListener('click',()=>{
+  const panel=document.getElementById('albumConstellationPanel');
+  const button=document.getElementById('albumConstellationToggle');
+  const opening=panel.classList.contains('hidden');
+  panel.classList.toggle('hidden',!opening);
+  button.setAttribute('aria-expanded',String(opening));
+  button.textContent=opening?'✦ Ocultar constelación de recuerdos':'✦ Ver constelación de recuerdos';
+  if(opening){albumRenderConstellation();panel.scrollIntoView({behavior:'smooth',block:'nearest'});}
+});
 function albumListenForUser(user){
   if(albumRootRef){albumRootRef.off();albumRootRef.child('albums').off();albumMetaRef.off();albumImageRef.off();albumThumbRef.off();}
   albumRootRef=null;albumMetaRef=null;albumImageRef=null;albumThumbRef=null;albumCache={};albumPhotosCache={};
