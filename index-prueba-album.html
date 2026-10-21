@@ -565,7 +565,7 @@ function prepareExport(records,bookTitle){
 }
 
 /* Mi álbum lunar: usa rutas separadas dentro del UID autenticado. */
-let albumRootRef = null, albumMetaRef = null, albumImageRef = null;
+let albumRootRef = null, albumMetaRef = null, albumImageRef = null, albumThumbRef = null;
 let albumCache = {}, albumPhotosCache = {}, albumSelectedDateOnly = false, albumBusy = false;
 const albumStatusEl = document.getElementById('albumStatus');
 const albumChooseEl = document.getElementById('albumChoose');
@@ -609,20 +609,27 @@ function albumRenderPhotos(){
       if(!currentUser||!albumImageRef||!albumMetaRef)return;
       if(!confirm('¿Quieres eliminar esta captura del álbum? Esta acción no se puede deshacer.'))return;
       del.disabled=true;
-      try{await albumImageRef.child(id).remove();await albumMetaRef.child(id).remove();albumStatus('Captura eliminada del álbum.');}
+      try{await albumImageRef.child(id).remove();await albumThumbRef.child(id).remove();await albumMetaRef.child(id).remove();albumStatus('Captura eliminada del álbum.');}
       catch(err){albumStatus('No se pudo eliminar: '+friendlyError(err));del.disabled=false;}
     });
     card.append(img,info,size,view,del);grid.appendChild(card);
-    /* Las imágenes no se descargan hasta que la usuaria pulse «Abrir captura», para ahorrar datos. */
+    /* Descarga solo la miniatura ligera; las capturas antiguas sin miniatura se abren con el botón. */
+    if(albumThumbRef){
+      albumThumbRef.child(id).once('value').then(snap=>{
+        const thumb=snap.val();
+        if(thumb && thumb.dataUrl) img.src=thumb.dataUrl;
+      }).catch(()=>{});
+    }
   });
 }
 function albumListenForUser(user){
-  if(albumRootRef){albumRootRef.off();albumMetaRef.off();albumImageRef.off();}
-  albumRootRef=null;albumMetaRef=null;albumImageRef=null;albumCache={};albumPhotosCache={};
+  if(albumRootRef){albumRootRef.off();albumRootRef.child('albums').off();albumMetaRef.off();albumImageRef.off();albumThumbRef.off();}
+  albumRootRef=null;albumMetaRef=null;albumImageRef=null;albumThumbRef=null;albumCache={};albumPhotosCache={};
   if(!user){albumRenderOptions();albumRenderPhotos();return;}
   albumRootRef=db.ref('users/'+user.uid+'/screenshotAlbums');
   albumMetaRef=albumRootRef.child('photos');
   albumImageRef=albumRootRef.child('images');
+  albumThumbRef=albumRootRef.child('thumbnails');
   albumRootRef.child('albums').on('value',snap=>{albumCache=snap.val()||{};albumRenderOptions();albumRenderPhotos();},err=>albumStatus('No se pudieron cargar los álbumes: '+friendlyError(err)));
   albumMetaRef.on('value',snap=>{albumPhotosCache=snap.val()||{};albumRenderPhotos();},err=>albumStatus('No se pudieron cargar las capturas: '+friendlyError(err)));
 }
@@ -678,9 +685,19 @@ document.getElementById('albumUploadButton').addEventListener('click',async()=>{
       const bytes=albumByteLength(dataUrl);
       if(bytes>650*1024){skipped++;skippedNames.push(file.name);albumStatus('La captura «'+file.name+'» ocupa '+Math.round(bytes/1024)+' KB después de optimizarla y se ha omitido para proteger el espacio gratuito.');continue;}
       const photoRef=albumMetaRef.push(), id=photoRef.key;
+      const thumbnailDataUrl=await new Promise((resolve,reject)=>{
+        const image=new Image();image.onerror=()=>reject(new Error('No se pudo preparar la miniatura de '+file.name));
+        image.onload=()=>{
+          const limit=320,scale=Math.min(1,limit/Math.max(image.width,image.height));
+          const canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(image.width*scale));canvas.height=Math.max(1,Math.round(image.height*scale));
+          const ctx=canvas.getContext('2d');ctx.fillStyle='#ffffff';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.drawImage(image,0,0,canvas.width,canvas.height);
+          let thumb=canvas.toDataURL('image/webp',0.55);if(!thumb.startsWith('data:image/webp'))thumb=canvas.toDataURL('image/jpeg',0.55);
+          resolve(thumb);
+        };image.src=dataUrl;
+      });
       const metadata={albumId:albumId,date:albumDateEl.value||todayLocal(),name:file.name.slice(0,180),bytes:bytes,mime:dataUrl.slice(5,dataUrl.indexOf(';')),createdAt:Date.now()};
-      try{await albumImageRef.child(id).set({dataUrl:dataUrl});await photoRef.set(metadata);saved++;}
-      catch(err){try{await albumImageRef.child(id).remove();}catch(_){}throw err;}
+      try{await albumImageRef.child(id).set({dataUrl:dataUrl});await albumThumbRef.child(id).set({dataUrl:thumbnailDataUrl});await photoRef.set(metadata);saved++;}
+      catch(err){try{await albumImageRef.child(id).remove();await albumThumbRef.child(id).remove();}catch(_){}throw err;}
     }
     input.value='';
     if(saved>0){
